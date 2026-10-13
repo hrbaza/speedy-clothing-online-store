@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { FiUploadCloud, FiX, FiPlus, FiCheck } from 'react-icons/fi'
+import { FiUploadCloud, FiX, FiPlus, FiCheck, FiArrowLeft } from 'react-icons/fi'
 import { authHeaders, backendUrl, currency, errorMessage, sortSizes } from '../config'
 
 const IMAGE_SLOTS = 4
@@ -11,7 +12,13 @@ const SUB_CATEGORIES = ['Topwear', 'Bottomwear', 'Winterwear']
 
 const emptyImages = () => Array(IMAGE_SLOTS).fill(null)
 
+// Used for both adding a product (/add) and editing one (/edit/:id).
+// Each image slot holds null, a new File, or (when editing) the URL of an existing image.
 const Add = ({ token }) => {
+  const { id } = useParams()
+  const isEdit = Boolean(id)
+  const navigate = useNavigate()
+  const [loadingProduct, setLoadingProduct] = useState(isEdit)
   const [images, setImages] = useState(emptyImages)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -24,8 +31,33 @@ const Add = ({ token }) => {
   const [submitting, setSubmitting] = useState(false)
 
   // Create preview URLs once per selected file and free them when they change
-  const previews = useMemo(() => images.map((file) => file && URL.createObjectURL(file)), [images])
-  useEffect(() => () => previews.forEach((url) => url && URL.revokeObjectURL(url)), [previews])
+  const previews = useMemo(() => images.map((item) => (item instanceof File ? URL.createObjectURL(item) : item)), [images])
+  useEffect(() => () => previews.forEach((url) => url?.startsWith('blob:') && URL.revokeObjectURL(url)), [previews])
+
+  // Edit mode: load the product into the form
+  useEffect(() => {
+    if (!isEdit) return
+
+    axios.post(`${backendUrl}/api/product/single`, { productId: id })
+      .then(({ data }) => {
+        if (!data.success) throw new Error(data.message)
+        const p = data.product
+        setImages(emptyImages().map((_, i) => p.image[i] || null))
+        setName(p.name)
+        setDescription(p.description)
+        setPrice(String(p.price))
+        setCategory(p.category)
+        setSubCategory(p.subCategory)
+        setSizes(p.sizes)
+        setBestseller(Boolean(p.bestseller))
+        setInStock(p.inStock !== false)
+      })
+      .catch((error) => {
+        toast.error(errorMessage(error) || 'Product not found')
+        navigate('/list')
+      })
+      .finally(() => setLoadingProduct(false))
+  }, [id])
 
   const setImageAt = (index, file) =>
     setImages((prev) => prev.map((current, i) => (i === index ? file : current)))
@@ -64,15 +96,24 @@ const Add = ({ token }) => {
     formData.append('bestseller', bestseller)
     formData.append('inStock', inStock)
     formData.append('sizes', JSON.stringify(sortSizes(sizes)))
-    images.forEach((file, i) => file && formData.append(`image${i + 1}`, file))
+    images.forEach((item, i) => item instanceof File && formData.append(`image${i + 1}`, item))
+    if (isEdit) {
+      formData.append('id', id)
+      formData.append('existingImages', JSON.stringify(images.map((item) => (typeof item === 'string' ? item : null))))
+    }
 
     setSubmitting(true)
     try {
-      const { data } = await axios.post(`${backendUrl}/api/product/add`, formData, { headers: authHeaders(token) })
+      const url = `${backendUrl}/api/product/${isEdit ? 'update' : 'add'}`
+      const { data } = await axios.post(url, formData, { headers: authHeaders(token) })
 
       if (data.success) {
         toast.success(data.message)
-        resetForm()
+        if (isEdit) {
+          navigate('/list')
+        } else {
+          resetForm()
+        }
       } else {
         toast.error(data.message)
       }
@@ -83,8 +124,23 @@ const Add = ({ token }) => {
     }
   }
 
+  if (loadingProduct) {
+    return (
+      <div className='grid gap-6 xl:grid-cols-[1.4fr_1fr]'>
+        <div className='h-96 animate-pulse rounded-3xl bg-ink/5' />
+        <div className='h-96 animate-pulse rounded-3xl bg-ink/5' />
+      </div>
+    )
+  }
+
   return (
     <form onSubmit={onSubmitHandler} className='grid gap-6 xl:grid-cols-[1.4fr_1fr]'>
+      {isEdit && (
+        <div className='flex items-center justify-between gap-4 rounded-2xl border border-brand-200 bg-brand-50 px-5 py-4 xl:col-span-2'>
+          <p className='text-sm'>Editing <span className='font-semibold'>{name}</span>. Changes go live in the store as soon as you save.</p>
+          <Link to='/list' className='flex shrink-0 items-center gap-1.5 text-sm font-semibold text-brand-700 hover:underline'><FiArrowLeft /> Back</Link>
+        </div>
+      )}
       <div className='space-y-6'>
         {/* Images */}
         <section className='card p-6 sm:p-8'>
@@ -215,7 +271,10 @@ const Add = ({ token }) => {
         </section>
 
         <button type="submit" disabled={submitting} className='btn-primary w-full py-4'>
-          <FiPlus /> {submitting ? 'Adding product...' : 'Add product'}
+          {isEdit ? <FiCheck /> : <FiPlus />}
+          {isEdit
+            ? (submitting ? 'Saving...' : 'Save changes')
+            : (submitting ? 'Adding product...' : 'Add product')}
         </button>
       </div>
     </form>

@@ -55,7 +55,8 @@ const App = () => {
             <main className='mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-10'>
               <Routes>
                 <Route path="/" element={<Dashboard token={token} />} />
-                <Route path="/add" element={<Add token={token} />} />
+                <Route path="/add" element={<Add key="add" token={token} />} />
+                <Route path="/edit/:id" element={<Add key="edit" token={token} />} />
                 <Route path="/list" element={<List token={token} />} />
                 <Route path="/orders" element={<Orders token={token} />} />
                 <Route path="*" element={<Navigate to="/" replace />} />

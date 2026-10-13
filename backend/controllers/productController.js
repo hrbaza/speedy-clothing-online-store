@@ -67,6 +67,53 @@ const removeProduct = async (req, res) => {
     }
 }
 
+// function for editing a product (admin)
+// Each image slot is either a new upload (image1..image4) or an existing URL from `existingImages`.
+const updateProduct = async (req, res) => {
+    try {
+        const { id, name, description, price, category, subCategory, sizes, bestseller, inStock, existingImages } = req.body
+
+        const product = await productModel.findById(id)
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found" })
+        }
+
+        const keep = JSON.parse(existingImages || '[]')
+        const slots = await Promise.all(IMAGE_FIELDS.map(async (field, i) => {
+            const file = req.files?.[field]?.[0]
+            if (file) {
+                const result = await cloudinary.uploader.upload(file.path, { resource_type: 'image' })
+                return result.secure_url
+            }
+            // Only keep URLs that already belong to this product
+            return product.image.includes(keep[i]) ? keep[i] : null
+        }))
+        const image = slots.filter(Boolean)
+
+        if (image.length === 0) {
+            return res.status(400).json({ success: false, message: "At least one image is required" })
+        }
+
+        Object.assign(product, {
+            name,
+            description,
+            category,
+            subCategory,
+            price: Number(price),
+            sizes: JSON.parse(sizes).sort((a, b) => sizeRank(a) - sizeRank(b)),
+            bestseller: bestseller === "true",
+            inStock: inStock !== "false",
+            image,
+        })
+        await product.save()
+
+        res.json({ success: true, message: "Product updated", product })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ success: false, message: error.message })
+    }
+}
+
 // function for marking a product in stock / out of stock (admin)
 const updateStock = async (req, res) => {
     try {
@@ -101,4 +148,4 @@ const singleProduct = async (req, res) => {
     }
 }
 
-export { listProducts, addProduct, removeProduct, singleProduct, updateStock }
+export { listProducts, addProduct, removeProduct, singleProduct, updateStock, updateProduct }

@@ -3,7 +3,7 @@ import userModel from "../models/userModel.js";
 import productModel from "../models/productModel.js";
 
 // global variables
-const deliveryCharge = 10
+const deliveryCharge = 200 // PKR
 const ORDER_STATUSES = ['Order Placed', 'Packing', 'Shipped', 'Out for delivery', 'Delivered']
 
 const clearCart = (userId) => userModel.findByIdAndUpdate(userId, { cartData: {} })

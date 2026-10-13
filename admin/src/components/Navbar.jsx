@@ -6,7 +6,9 @@ import { NAV_LINKS } from './Sidebar'
 // Top bar: page title on desktop, logo + tab navigation on small screens
 const Navbar = ({ setToken }) => {
   const { pathname } = useLocation()
-  const current = NAV_LINKS.find(({ to }) => to === pathname) || NAV_LINKS[0]
+  const current = pathname.startsWith('/edit/')
+    ? { title: 'Edit Product' }
+    : NAV_LINKS.find(({ to }) => to === pathname) || NAV_LINKS[0]
   const today = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (

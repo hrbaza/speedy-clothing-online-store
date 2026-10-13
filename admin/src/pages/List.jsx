@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { FiSearch, FiTrash2, FiPlus, FiBox, FiStar } from 'react-icons/fi'
+import { FiSearch, FiTrash2, FiPlus, FiBox, FiStar, FiEdit2 } from 'react-icons/fi'
 import { authHeaders, backendUrl, errorMessage, formatMoney, sortSizes } from '../config'
 
 const TABS = ['All', 'Men', 'Women', 'Kids', 'Out of stock']
@@ -125,7 +125,7 @@ const List = ({ token }) => {
 
       <div className='card overflow-hidden'>
         {/* Table header (desktop) */}
-        <div className='hidden grid-cols-[80px_3fr_1.2fr_1fr_1.3fr_56px] items-center gap-4 border-b border-ink/5 bg-ink/[0.02] px-6 py-4 text-xs font-semibold uppercase tracking-wider text-ink/50 md:grid'>
+        <div className='hidden grid-cols-[80px_3fr_1.2fr_1fr_1.3fr_96px] items-center gap-4 border-b border-ink/5 bg-ink/[0.02] px-6 py-4 text-xs font-semibold uppercase tracking-wider text-ink/50 md:grid'>
           <span>Image</span>
           <span>Product</span>
           <span>Category</span>
@@ -145,7 +145,7 @@ const List = ({ token }) => {
         ) : (
           <ul className='divide-y divide-ink/5'>
             {visible.map((item) => (
-              <li key={item._id} className='grid grid-cols-[64px_1fr_auto] items-center gap-4 px-4 py-4 transition hover:bg-ink/[0.02] sm:px-6 md:grid-cols-[80px_3fr_1.2fr_1fr_1.3fr_56px]'>
+              <li key={item._id} className='grid grid-cols-[64px_1fr_auto] items-center gap-4 px-4 py-4 transition hover:bg-ink/[0.02] sm:px-6 md:grid-cols-[80px_3fr_1.2fr_1fr_1.3fr_96px]'>
                 <img className={`h-20 w-16 rounded-xl bg-ink/5 object-cover md:w-20 ${isInStock(item) ? '' : 'opacity-50 grayscale'}`} src={item.image[0]} alt={item.name} />
                 <div className='min-w-0'>
                   <p className='truncate font-semibold'>{item.name}</p>
@@ -166,11 +166,20 @@ const List = ({ token }) => {
                 <div className='hidden md:block'>
                   <StockToggle inStock={isInStock(item)} busy={updatingId === item._id} onToggle={() => toggleStock(item)} />
                 </div>
-                <div className='text-right'>
+                <div className='flex flex-col items-end gap-1 md:flex-row md:justify-end'>
+                  <Link
+                    to={`/edit/${item._id}`}
+                    className='grid h-10 w-10 place-items-center rounded-full text-ink/40 transition hover:bg-brand-50 hover:text-brand-600'
+                    aria-label='Edit product'
+                    title='Edit product'
+                  >
+                    <FiEdit2 />
+                  </Link>
                   <button
                     onClick={() => removeProduct(item._id)}
-                    className='grid h-10 w-10 place-items-center rounded-full text-ink/40 transition hover:bg-red-50 hover:text-red-600 md:ml-auto'
+                    className='grid h-10 w-10 place-items-center rounded-full text-ink/40 transition hover:bg-red-50 hover:text-red-600'
                     aria-label='Remove product'
+                    title='Remove product'
                   >
                     <FiTrash2 />
                   </button>

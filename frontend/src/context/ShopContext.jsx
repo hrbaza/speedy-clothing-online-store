@@ -10,7 +10,7 @@ const currency = 'Rs';
 // Pakistani Rupees, e.g. 1299 -> "Rs 1,299"
 export const formatPrice = (value) =>
     `${currency} ${Number(value || 0).toLocaleString('en-PK', { maximumFractionDigits: 2 })}`;
-const delivery_fee = 10;
+const delivery_fee = 200; // PKR, must match deliveryCharge in the backend
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 // Best error message available from an axios error
