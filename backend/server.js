@@ -18,6 +18,12 @@ connectCloudinary()
 app.use(express.json())
 app.use(cors())
 
+// Make sure the database is connected before any API request (retries if it dropped)
+app.use('/api', async (req, res, next) => {
+    if (await connectDB()) return next()
+    res.status(503).json({ success: false, message: 'Database is not reachable right now. Please try again shortly.' })
+})
+
 // api endpoints
 app.use('/api/user', userRouter)
 app.use('/api/product', productRouter)
