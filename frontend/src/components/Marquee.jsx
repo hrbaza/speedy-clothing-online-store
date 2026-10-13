@@ -1,4 +1,4 @@
-const ITEMS = ['New Season Drop', 'Premium Cotton', 'Cash On Delivery', '7-Day Easy Returns', 'Secure Stripe Checkout', 'Where Speed Meets Style']
+const ITEMS = ['New Season Drop', 'Premium Cotton', 'Cash On Delivery', '7-Day Easy Returns', 'Easy Exchanges', 'Where Speed Meets Style']
 
 // Tilted, scrolling brand strip; the list is rendered twice so the loop is seamless
 const Marquee = () => {

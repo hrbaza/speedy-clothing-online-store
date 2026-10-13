@@ -91,8 +91,7 @@ const Footer = () => {
         <div className="container-x flex flex-col items-center justify-between gap-4 py-6 text-sm text-white/50 sm:flex-row">
           <p>© {new Date().getFullYear()} SpeedClothing.com — All Rights Reserved</p>
           <div className="flex items-center gap-3">
-            <span className="rounded-md bg-white px-2 py-1"><img src={assets.stripe_logo} alt="Stripe" className="h-4" /></span>
-            <span className="rounded-md border border-white/15 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-white/70">COD</span>
+            <span className="rounded-md border border-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white/70">Cash on delivery</span>
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="ml-2 grid h-10 w-10 place-items-center rounded-full bg-brand-600 text-white transition hover:-translate-y-1"

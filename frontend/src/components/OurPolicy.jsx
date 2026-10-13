@@ -3,7 +3,7 @@ import { FiRefreshCw, FiAward, FiHeadphones, FiTruck } from 'react-icons/fi'
 const POLICIES = [
   { icon: FiRefreshCw, title: 'Easy Exchange', description: 'Hassle-free exchanges on every order.' },
   { icon: FiAward, title: '7-Day Returns', description: 'Return within 7 days — no questions asked.' },
-  { icon: FiTruck, title: 'Cash on Delivery', description: 'Pay at your door, or securely with Stripe.' },
+  { icon: FiTruck, title: 'Cash on Delivery', description: 'Pay in cash when your order arrives.' },
   { icon: FiHeadphones, title: '24/7 Support', description: 'Our team is here whenever you need us.' },
 ]
 

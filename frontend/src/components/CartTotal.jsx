@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { FiArrowRight, FiLock } from 'react-icons/fi';
+import { FiArrowRight, FiTruck } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { ShopContext } from '../context/ShopContext';
 
@@ -45,7 +45,7 @@ const CartTotal = ({ showCheckout = false }) => {
       )}
 
       <p className="mt-5 flex items-center justify-center gap-2 text-xs text-ink/50">
-        <FiLock /> Secure checkout · Cash on delivery available
+        <FiTruck /> Pay with cash on delivery
       </p>
     </div>
   );

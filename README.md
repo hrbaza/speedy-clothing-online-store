@@ -6,12 +6,12 @@ MERN stack e-commerce store (Final Year Project).
 | --- | --- | --- |
 | `frontend/` | Customer store (React + Vite + Tailwind) | 5173 |
 | `admin/` | Admin panel: add/list products, manage orders | 5174 |
-| `backend/` | REST API (Express + MongoDB + Cloudinary + Stripe) | 5000 |
+| `backend/` | REST API (Express + MongoDB + Cloudinary) | 5000 |
 
 ## Features
 - Product catalogue with search, category filters and price sorting
 - Cart synced to the user's account, JWT login/register
-- Checkout with Cash on Delivery or Stripe (payment verified with Stripe on the server)
+- Checkout with Cash on Delivery
 - Order prices calculated on the server from the database
 - Admin panel: upload products with images (Cloudinary), update order status, delete orders
 

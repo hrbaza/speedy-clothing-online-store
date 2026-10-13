@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiTruck, FiRefreshCw, FiShield } from 'react-icons/fi';
+import { FiArrowRight, FiTruck, FiRefreshCw, FiAward } from 'react-icons/fi';
 import { assets } from '../assets/assets';
 
 const PERKS = [
   { icon: FiTruck, text: 'Cash on delivery' },
   { icon: FiRefreshCw, text: '7-day easy returns' },
-  { icon: FiShield, text: 'Secure checkout' },
+  { icon: FiAward, text: 'Premium cotton' },
 ];
 
 const Hero = () => {

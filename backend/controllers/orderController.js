@@ -1,29 +1,16 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import productModel from "../models/productModel.js";
-import Stripe from 'stripe'
-import razorpay from 'razorpay'
 
 // global variables
-const currency = 'usd'
 const deliveryCharge = 10
 const ORDER_STATUSES = ['Order Placed', 'Packing', 'Shipped', 'Out for delivery', 'Delivered']
-
-// gateway initialize
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
-
-const razorpayInstance = new razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-})
-
-const toCents = (amount) => Math.round(amount * 100)
 
 const clearCart = (userId) => userModel.findByIdAndUpdate(userId, { cartData: {} })
 
 // Builds the order from the client's cart, but takes name/price from the database
 // so the customer cannot change what they pay.
-const createOrder = async (userId, { items, address }, paymentMethod) => {
+const createOrder = async (userId, { items, address }) => {
     if (!Array.isArray(items) || items.length === 0) {
         throw new Error('Your cart is empty')
     }
@@ -50,124 +37,21 @@ const createOrder = async (userId, { items, address }, paymentMethod) => {
         items: orderItems,
         address,
         amount: subtotal + deliveryCharge,
-        paymentMethod,
+        paymentMethod: 'COD',
         payment: false,
         date: Date.now()
     })
 }
 
-// Placing orders using COD Method
+// Placing orders (Cash on Delivery is the only payment method)
 const placeOrder = async (req, res) => {
     try {
-        await createOrder(req.userId, req.body, 'COD')
+        await createOrder(req.userId, req.body)
         await clearCart(req.userId)
         res.json({ success: true, message: 'Order Placed' })
     } catch (error) {
         console.error(error)
         res.status(400).json({ success: false, message: error.message })
-    }
-}
-
-// Placing orders using Stripe Method
-const placeOrderStripe = async (req, res) => {
-    try {
-        const { origin } = req.headers
-        const order = await createOrder(req.userId, req.body, 'Stripe')
-
-        const line_items = order.items.map((item) => ({
-            price_data: {
-                currency,
-                product_data: { name: item.name },
-                unit_amount: toCents(item.price)
-            },
-            quantity: item.quantity
-        }))
-
-        line_items.push({
-            price_data: {
-                currency,
-                product_data: { name: 'Delivery Charges' },
-                unit_amount: toCents(deliveryCharge)
-            },
-            quantity: 1
-        })
-
-        const session = await stripe.checkout.sessions.create({
-            success_url: `${origin}/verify?success=true&orderId=${order._id}`,
-            cancel_url: `${origin}/verify?success=false&orderId=${order._id}`,
-            line_items,
-            mode: 'payment',
-        })
-
-        order.paymentRef = session.id
-        await order.save()
-
-        res.json({ success: true, session_url: session.url })
-    } catch (error) {
-        console.error(error)
-        res.status(400).json({ success: false, message: error.message })
-    }
-}
-
-// Verify Stripe payment by asking Stripe directly (the `success` query param can be faked)
-const verifyStripe = async (req, res) => {
-    try {
-        const { orderId } = req.body
-        const order = await orderModel.findOne({ _id: orderId, userId: req.userId })
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' })
-        }
-
-        const session = order.paymentRef && await stripe.checkout.sessions.retrieve(order.paymentRef)
-
-        if (session?.payment_status === 'paid') {
-            order.payment = true
-            await order.save()
-            await clearCart(req.userId)
-            res.json({ success: true })
-        } else {
-            await order.deleteOne()
-            res.json({ success: false })
-        }
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({ success: false, message: error.message })
-    }
-}
-
-// Placing orders using Razorpay Method
-const placeOrderRazorpay = async (req, res) => {
-    try {
-        const order = await createOrder(req.userId, req.body, 'Razorpay')
-
-        const razorpayOrder = await razorpayInstance.orders.create({
-            amount: toCents(order.amount),
-            currency: currency.toUpperCase(),
-            receipt: order._id.toString()
-        })
-
-        res.json({ success: true, order: razorpayOrder })
-    } catch (error) {
-        console.error(error)
-        res.status(400).json({ success: false, message: error.message || 'Razorpay error' })
-    }
-}
-
-const verifyRazorpay = async (req, res) => {
-    try {
-        const { razorpay_order_id } = req.body
-
-        const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)
-        if (orderInfo.status !== 'paid') {
-            return res.json({ success: false, message: 'Payment Failed' })
-        }
-
-        await orderModel.findOneAndUpdate({ _id: orderInfo.receipt, userId: req.userId }, { payment: true })
-        await clearCart(req.userId)
-        res.json({ success: true, message: 'Payment Successful' })
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({ success: false, message: error.message })
     }
 }
 
@@ -228,4 +112,4 @@ const deleteOrder = async (req, res) => {
     }
 }
 
-export { verifyRazorpay, verifyStripe, placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus, deleteOrder }
+export { placeOrder, allOrders, userOrders, updateStatus, deleteOrder }
