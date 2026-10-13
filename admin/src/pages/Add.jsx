@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { assets } from '../assets/assets'
-import { authHeaders, backendUrl, errorMessage } from '../config'
+import { FiUploadCloud, FiX, FiPlus, FiCheck } from 'react-icons/fi'
+import { authHeaders, backendUrl, currency, errorMessage } from '../config'
 
 const IMAGE_SLOTS = 4
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL']
@@ -81,74 +81,131 @@ const Add = ({ token }) => {
   }
 
   return (
-    <form onSubmit={onSubmitHandler} className='flex flex-col w-full items-start gap-3'>
-      <div>
-        <p className='mb-2'>Upload Image</p>
+    <form onSubmit={onSubmitHandler} className='grid gap-6 xl:grid-cols-[1.4fr_1fr]'>
+      <div className='space-y-6'>
+        {/* Images */}
+        <section className='card p-6 sm:p-8'>
+          <h2 className='heading text-lg'>Product images</h2>
+          <p className='mt-1 text-sm text-ink/50'>Up to 4 images. The first one is used as the cover.</p>
 
-        <div className='flex gap-2'>
-          {previews.map((preview, i) => (
-            <label key={i} htmlFor={`image${i + 1}`}>
-              <img className='w-20' src={preview || assets.upload_area} alt="" />
-              <input onChange={(e) => setImageAt(i, e.target.files[0] || null)} type="file" accept="image/*" id={`image${i + 1}`} hidden />
-            </label>
-          ))}
-        </div>
+          <div className='mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4'>
+            {previews.map((preview, i) => (
+              <div key={i} className='relative'>
+                <label
+                  htmlFor={`image${i + 1}`}
+                  className={`group flex aspect-[4/5] cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed text-ink/40 transition ${
+                    preview ? 'border-transparent' : 'border-ink/15 bg-ink/[0.02] hover:border-brand-500 hover:bg-brand-50 hover:text-brand-600'
+                  }`}
+                >
+                  {preview ? (
+                    <img className='h-full w-full object-cover' src={preview} alt={`Upload ${i + 1}`} />
+                  ) : (
+                    <>
+                      <FiUploadCloud className='text-2xl' />
+                      <span className='text-xs font-semibold uppercase tracking-wider'>{i === 0 ? 'Cover' : `Image ${i + 1}`}</span>
+                    </>
+                  )}
+                  <input
+                    onChange={(e) => { setImageAt(i, e.target.files[0] || null); e.target.value = '' }}
+                    type="file"
+                    accept="image/*"
+                    id={`image${i + 1}`}
+                    hidden
+                  />
+                </label>
+                {i === 0 && preview && (
+                  <span className='absolute left-2 top-2 rounded-md bg-ink px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white'>Cover</span>
+                )}
+                {preview && (
+                  <button
+                    type='button'
+                    onClick={() => setImageAt(i, null)}
+                    className='absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-white text-ink shadow-soft transition hover:bg-red-500 hover:text-white'
+                    aria-label='Remove image'
+                  >
+                    <FiX />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Details */}
+        <section className='card space-y-5 p-6 sm:p-8'>
+          <h2 className='heading text-lg'>Product details</h2>
+          <div>
+            <label htmlFor='name' className='label'>Product name</label>
+            <input id='name' onChange={(e) => setName(e.target.value)} value={name} className='input' type="text" placeholder='e.g. Midnight Raglan Tee' required />
+          </div>
+          <div>
+            <label htmlFor='description' className='label'>Description</label>
+            <textarea id='description' rows={5} onChange={(e) => setDescription(e.target.value)} value={description} className='input resize-none' placeholder='Fabric, fit, and what makes it special...' required />
+          </div>
+        </section>
       </div>
 
-      <div className='w-full'>
-        <p className='mb-2'>Product name</p>
-        <input onChange={(e) => setName(e.target.value)} value={name} className='w-full max-w-[500px] px-3 py-2' type="text" placeholder='Type here' required />
+      <div className='space-y-6 xl:sticky xl:top-28 xl:self-start'>
+        {/* Organisation */}
+        <section className='card space-y-5 p-6 sm:p-8'>
+          <h2 className='heading text-lg'>Pricing & category</h2>
+          <div>
+            <label htmlFor='price' className='label'>Price</label>
+            <div className='relative'>
+              <span className='absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-ink/40'>{currency}</span>
+              <input id='price' onChange={(e) => setPrice(e.target.value)} value={price} className='input pl-9' type="number" min="0" step="0.01" placeholder='25.00' required />
+            </div>
+          </div>
+          <div className='grid grid-cols-2 gap-4'>
+            <div>
+              <label htmlFor='category' className='label'>Category</label>
+              <select id='category' value={category} onChange={(e) => setCategory(e.target.value)} className='input'>
+                {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
+              </select>
+            </div>
+            <div>
+              <label htmlFor='subCategory' className='label'>Type</label>
+              <select id='subCategory' value={subCategory} onChange={(e) => setSubCategory(e.target.value)} className='input'>
+                {SUB_CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <p className='label'>Available sizes</p>
+            <div className='flex flex-wrap gap-2'>
+              {SIZES.map((size) => {
+                const active = sizes.includes(size)
+                return (
+                  <button
+                    type='button'
+                    key={size}
+                    onClick={() => toggleSize(size)}
+                    className={`flex h-11 min-w-12 items-center justify-center gap-1 rounded-xl border px-3 text-sm font-semibold transition ${
+                      active ? 'border-brand-600 bg-brand-600 text-white shadow-glow' : 'border-ink/15 hover:border-ink'
+                    }`}
+                  >
+                    {active && <FiCheck className='text-xs' />}{size}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <label htmlFor='bestseller' className='flex cursor-pointer items-center justify-between rounded-2xl border border-ink/10 p-4'>
+            <span>
+              <span className='block text-sm font-semibold'>Bestseller</span>
+              <span className='text-xs text-ink/50'>Show in the store&apos;s Best Sellers section</span>
+            </span>
+            <input onChange={() => setBestseller((prev) => !prev)} checked={bestseller} type="checkbox" id='bestseller' className='peer sr-only' />
+            <span className='relative h-7 w-12 rounded-full bg-ink/15 transition after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:bg-brand-600 peer-checked:after:translate-x-5' />
+          </label>
+        </section>
+
+        <button type="submit" disabled={submitting} className='btn-primary w-full py-4'>
+          <FiPlus /> {submitting ? 'Adding product...' : 'Add product'}
+        </button>
       </div>
-
-      <div className='w-full'>
-        <p className='mb-2'>Product description</p>
-        <textarea onChange={(e) => setDescription(e.target.value)} value={description} className='w-full max-w-[500px] px-3 py-2' placeholder='Write content here' required />
-      </div>
-
-      <div className='flex flex-col sm:flex-row gap-2 w-full sm:gap-8'>
-        <div>
-          <p className='mb-2'>Product category</p>
-          <select value={category} onChange={(e) => setCategory(e.target.value)} className='w-full px-3 py-2'>
-            {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
-        </div>
-
-        <div>
-          <p className='mb-2'>Sub category</p>
-          <select value={subCategory} onChange={(e) => setSubCategory(e.target.value)} className='w-full px-3 py-2'>
-            {SUB_CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
-        </div>
-
-        <div>
-          <p className='mb-2'>Product Price</p>
-          <input onChange={(e) => setPrice(e.target.value)} value={price} className='w-full px-3 py-2 sm:w-[120px]' type="number" min="0" step="0.01" placeholder='25' required />
-        </div>
-      </div>
-
-      <div>
-        <p className='mb-2'>Product Sizes</p>
-        <div className='flex gap-3'>
-          {SIZES.map((size) => (
-            <p
-              key={size}
-              onClick={() => toggleSize(size)}
-              className={`${sizes.includes(size) ? 'bg-pink-100' : 'bg-slate-200'} px-3 py-1 cursor-pointer`}
-            >
-              {size}
-            </p>
-          ))}
-        </div>
-      </div>
-
-      <div className='flex gap-2 mt-2'>
-        <input onChange={() => setBestseller((prev) => !prev)} checked={bestseller} type="checkbox" id='bestseller' />
-        <label className='cursor-pointer' htmlFor="bestseller">Add to bestseller</label>
-      </div>
-
-      <button type="submit" disabled={submitting} className='w-28 py-3 mt-4 bg-black text-white disabled:opacity-50'>
-        {submitting ? 'ADDING...' : 'ADD'}
-      </button>
     </form>
   )
 }

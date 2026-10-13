@@ -1,19 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Outfit:wght@300..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-*{
-    font-family: Outfit;
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-[#f5f6fa] font-sans text-ink;
+  }
+
+  ::selection {
+    @apply bg-brand-600 text-white;
+  }
 }
 
-select,input,textarea{
-    border: 1px solid #c2c2c2;
-    outline-color: #C586A5;
-    border-radius: 4px;
+@layer components {
+  /* Wide, heavy headings that match the logo lettering */
+  .heading {
+    @apply font-display font-extrabold uppercase tracking-tight;
+    font-stretch: 118%;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand-600;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-wider transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-glow hover:-translate-y-0.5 hover:from-brand-700 hover:to-brand-600 disabled:hover:translate-y-0;
+  }
+
+  .btn-dark {
+    @apply btn bg-ink text-white hover:bg-brand-600;
+  }
+
+  .btn-outline {
+    @apply btn border border-ink/15 bg-white text-ink hover:border-ink hover:bg-ink hover:text-white;
+  }
+
+  .card {
+    @apply rounded-3xl border border-ink/5 bg-white shadow-soft;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-ink/10 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-ink/40 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-ink/60;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset;
+  }
 }
 
-.active{
-    background-color: #ffebf5;
-    border-color: #C586A5;
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-400 via-brand-500 to-sky-400 bg-clip-text text-transparent;
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Horizontal tab rows scroll without showing a scrollbar */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mask-fade {
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
 }

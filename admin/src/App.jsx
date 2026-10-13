@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import Login from './components/Login'
+import Dashboard from './pages/Dashboard'
 import Add from './pages/Add'
 import List from './pages/List'
 import Orders from './pages/Orders'
@@ -35,35 +36,35 @@ const App = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      <div className="grid min-h-screen place-items-center bg-ink">
+        <span className="h-14 w-14 animate-spin rounded-full border-4 border-white/10 border-t-brand-500" />
       </div>
     );
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
-      <ToastContainer />
+    <>
+      <ToastContainer position='bottom-right' theme='dark' />
       {!token ? (
         <Login setToken={setToken} />
       ) : (
-        <>
-          <Navbar setToken={setToken} />
-          <hr />
-          <div className='flex w-full'>
-            <Sidebar />
-            <div className='w-[70%] mx-auto ml-[max(5vw,25px)] my-8 text-gray-600 text-base'>
+        <div className='min-h-screen'>
+          <Sidebar setToken={setToken} />
+          <div className='lg:pl-72'>
+            <Navbar setToken={setToken} />
+            <main className='mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-10'>
               <Routes>
-                <Route path="/" element={<List token={token} />} />
+                <Route path="/" element={<Dashboard token={token} />} />
                 <Route path="/add" element={<Add token={token} />} />
                 <Route path="/list" element={<List token={token} />} />
                 <Route path="/orders" element={<Orders token={token} />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
-            </div>
+            </main>
           </div>
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 }
 
