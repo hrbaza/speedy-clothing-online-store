@@ -2,6 +2,8 @@ import { v2 as cloudinary } from "cloudinary"
 import productModel from "../models/productModel.js"
 
 const IMAGE_FIELDS = ['image1', 'image2', 'image3', 'image4']
+const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+const sizeRank = (size) => (SIZE_ORDER.includes(size) ? SIZE_ORDER.indexOf(size) : SIZE_ORDER.length)
 
 // function for add product
 const addProduct = async (req, res) => {
@@ -30,7 +32,7 @@ const addProduct = async (req, res) => {
             price: Number(price),
             subCategory,
             bestseller: bestseller === "true",
-            sizes: JSON.parse(sizes),
+            sizes: JSON.parse(sizes).sort((a, b) => sizeRank(a) - sizeRank(b)),
             image: imagesUrl,
             date: Date.now()
         })

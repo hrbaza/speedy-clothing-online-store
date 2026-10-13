@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { FiSearch, FiTrash2, FiPlus, FiBox, FiStar } from 'react-icons/fi'
-import { authHeaders, backendUrl, errorMessage, formatMoney } from '../config'
+import { authHeaders, backendUrl, errorMessage, formatMoney, sortSizes } from '../config'
 
 const TABS = ['All', 'Men', 'Women', 'Kids']
 
@@ -108,7 +108,7 @@ const List = ({ token }) => {
                 <div className='min-w-0'>
                   <p className='truncate font-semibold'>{item.name}</p>
                   <div className='mt-1 flex flex-wrap items-center gap-2 text-xs text-ink/50'>
-                    <span>{item.sizes.join(' · ')}</span>
+                    <span>{sortSizes(item.sizes).join(' · ')}</span>
                     {item.bestseller && <span className='badge bg-amber-50 text-amber-700 ring-amber-600/20'><FiStar /> Bestseller</span>}
                   </div>
                   <p className='mt-1 text-sm font-bold md:hidden'>{formatMoney(item.price)} · <span className='font-normal text-ink/50'>{item.category}</span></p>

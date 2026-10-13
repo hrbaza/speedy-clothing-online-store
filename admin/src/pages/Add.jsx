@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { FiUploadCloud, FiX, FiPlus, FiCheck } from 'react-icons/fi'
-import { authHeaders, backendUrl, currency, errorMessage } from '../config'
+import { authHeaders, backendUrl, currency, errorMessage, sortSizes } from '../config'
 
 const IMAGE_SLOTS = 4
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL']
@@ -60,7 +60,7 @@ const Add = ({ token }) => {
     formData.append('category', category)
     formData.append('subCategory', subCategory)
     formData.append('bestseller', bestseller)
-    formData.append('sizes', JSON.stringify(sizes))
+    formData.append('sizes', JSON.stringify(sortSizes(sizes)))
     images.forEach((file, i) => file && formData.append(`image${i + 1}`, file))
 
     setSubmitting(true)

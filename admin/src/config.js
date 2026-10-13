@@ -6,6 +6,11 @@ export const authHeaders = (token) => ({ Authorization: `Bearer ${token}` })
 // Best error message available from an axios error
 export const errorMessage = (error) => error.response?.data?.message || error.message
 
+// Sizes are always shown smallest to largest, whatever order they were saved in
+const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+const sizeRank = (size) => (SIZE_ORDER.includes(size) ? SIZE_ORDER.indexOf(size) : SIZE_ORDER.length)
+export const sortSizes = (sizes) => [...sizes].sort((a, b) => sizeRank(a) - sizeRank(b))
+
 export const ORDER_STATUSES = ['Order Placed', 'Packing', 'Shipped', 'Out for delivery', 'Delivered']
 
 // Badge colours per order status

@@ -12,6 +12,11 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 // Best error message available from an axios error
 export const errorMessage = (error) => error.response?.data?.message || error.message
 
+// Sizes are always shown smallest to largest, whatever order they were saved in
+const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+const sizeRank = (size) => (SIZE_ORDER.includes(size) ? SIZE_ORDER.indexOf(size) : SIZE_ORDER.length)
+export const sortSizes = (sizes) => [...sizes].sort((a, b) => sizeRank(a) - sizeRank(b))
+
 const ShopContextProvider = (props) => {
 
     const [search, setSearch] = useState('');
@@ -103,7 +108,7 @@ const ShopContextProvider = (props) => {
         try {
             const { data } = await axios.get(backendUrl + '/api/product/list')
             if (data.success) {
-                setProducts(data.products)
+                setProducts(data.products.map((product) => ({ ...product, sizes: sortSizes(product.sizes) })))
             } else {
                 toast.error(data.message)
             }
