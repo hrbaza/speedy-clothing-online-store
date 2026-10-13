@@ -15,8 +15,8 @@ const saveCart = (userId, cartData) => userModel.findByIdAndUpdate(userId, { car
 // Add products to user cart
 const addToCart = async (req, res) => {
     try {
-        const { itemId, size } = req.body;
-        if (!itemId || !size) {
+        const { itemId, size, quantity = 1 } = req.body;
+        if (!itemId || !size || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
             return res.status(400).json({ success: false, message: "Invalid input data" });
         }
 
@@ -24,7 +24,7 @@ const addToCart = async (req, res) => {
         if (!cartData) return;
 
         cartData[itemId] = cartData[itemId] || {};
-        cartData[itemId][size] = (cartData[itemId][size] || 0) + 1;
+        cartData[itemId][size] = (cartData[itemId][size] || 0) + quantity;
 
         await saveCart(req.userId, cartData);
         res.status(200).json({ success: true, message: "Added To Cart" });

@@ -45,7 +45,7 @@ const ShopContextProvider = (props) => {
         setTokenState(newToken)
     }
 
-    const addToCart = async (itemId, size) => {
+    const addToCart = async (itemId, size, quantity = 1) => {
         if (!isInStock(products.find((product) => product._id === itemId))) {
             toast.error('Sorry, this product is out of stock');
             return;
@@ -57,13 +57,13 @@ const ShopContextProvider = (props) => {
 
         const cartData = structuredClone(cartItems);
         cartData[itemId] = cartData[itemId] || {};
-        cartData[itemId][size] = (cartData[itemId][size] || 0) + 1;
+        cartData[itemId][size] = (cartData[itemId][size] || 0) + quantity;
         setCartItems(cartData);
-        toast.success('Added to cart');
+        toast.success(quantity > 1 ? `${quantity} items added to cart` : 'Added to cart');
 
         if (token) {
             try {
-                await axios.post(backendUrl + '/api/cart/add', { itemId, size }, { headers: { token } });
+                await axios.post(backendUrl + '/api/cart/add', { itemId, size, quantity }, { headers: { token } });
             } catch (error) {
                 console.error('Could not save cart:', errorMessage(error));
             }

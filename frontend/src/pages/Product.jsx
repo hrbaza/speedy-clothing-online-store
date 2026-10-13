@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FaStar } from 'react-icons/fa'
-import { FiChevronRight, FiShoppingBag, FiZap, FiTruck, FiRefreshCw, FiCheckCircle, FiXCircle } from 'react-icons/fi'
+import { FiChevronRight, FiShoppingBag, FiZap, FiTruck, FiRefreshCw, FiCheckCircle, FiXCircle, FiMinus, FiPlus } from 'react-icons/fi'
 import { ShopContext, isInStock } from '../context/ShopContext';
 import RelatedProducts from '../components/RelatedProducts';
 
 const RATING = 4
+const MAX_QUANTITY = 10
 const REVIEW_COUNT = 122
 
 const PERKS = [
@@ -33,11 +34,13 @@ const Product = () => {
   const productData = products.find((item) => item._id === productId);
   const [image, setImage] = useState('')
   const [size, setSize] = useState('')
+  const [quantity, setQuantity] = useState(1)
 
   // Reset gallery and size when switching to another product
   useEffect(() => {
     setImage(productData?.image[0] || '');
     setSize('');
+    setQuantity(1);
   }, [productData])
 
   if (!productData) {
@@ -57,7 +60,7 @@ const Product = () => {
       addToCart(productData._id, size) // shows the "select size" message
       return
     }
-    addToCart(productData._id, size)
+    addToCart(productData._id, size, quantity)
     navigate('/cart')
   }
 
@@ -147,9 +150,37 @@ const Product = () => {
               </div>
             </div>
 
+            {inStock && (
+              <div className='mt-8'>
+                <p className='text-sm font-semibold uppercase tracking-wider'>Quantity</p>
+                <div className='mt-4 inline-flex items-center rounded-full border border-ink/15 p-1'>
+                  <button
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    disabled={quantity <= 1}
+                    className='grid h-10 w-10 place-items-center rounded-full transition hover:bg-ink hover:text-white disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-ink'
+                    aria-label='Decrease quantity'
+                  >
+                    <FiMinus />
+                  </button>
+                  <span className='w-12 text-center font-display text-lg font-bold'>{quantity}</span>
+                  <button
+                    onClick={() => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1))}
+                    disabled={quantity >= MAX_QUANTITY}
+                    className='grid h-10 w-10 place-items-center rounded-full transition hover:bg-ink hover:text-white disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-ink'
+                    aria-label='Increase quantity'
+                  >
+                    <FiPlus />
+                  </button>
+                </div>
+                {quantity > 1 && (
+                  <span className='ml-4 text-sm text-ink/50'>Total: <span className='font-semibold text-ink'>{formatPrice(productData.price * quantity)}</span></span>
+                )}
+              </div>
+            )}
+
             {inStock ? (
               <div className='mt-10 flex flex-col gap-3 sm:flex-row'>
-                <button onClick={() => addToCart(productData._id, size)} className='btn-primary flex-1 py-4'>
+                <button onClick={() => addToCart(productData._id, size, quantity)} className='btn-primary flex-1 py-4'>
                   <FiShoppingBag /> Add to cart
                 </button>
                 <button onClick={buyNow} className='btn-dark flex-1 py-4'>
