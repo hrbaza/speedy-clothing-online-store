@@ -1,7 +1,14 @@
 import { toast } from 'react-toastify'
+import { FiMapPin, FiPhone, FiMail, FiClock, FiSend } from 'react-icons/fi'
+import PageHeader from '../components/PageHeader'
 import NewsletterBox from '../components/NewsletterBox'
 
-const inputClass = 'w-full border border-blue-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500'
+const CONTACT_INFO = [
+  { icon: FiMapPin, title: 'Our location', lines: ['Near Satellite Town, One Unit Chowk', 'Bahawalpur'] },
+  { icon: FiPhone, title: 'Call us', lines: ['(+92) 303 921 9730'], href: 'tel:+923039219730' },
+  { icon: FiMail, title: 'Email us', lines: ['Speedclothing@gmail.com'], href: 'mailto:Speedclothing@gmail.com' },
+  { icon: FiClock, title: 'Store hours', lines: ['Mon – Fri: 9:00 AM – 6:00 PM', 'Sat: 10:00 AM – 5:00 PM · Sun: Closed'] },
+]
 
 const Contact = () => {
 
@@ -13,110 +20,67 @@ const Contact = () => {
   }
 
   return (
-    <div className='bg-gradient-to-b from-blue-50 to-indigo-50 min-h-screen py-16'>
-      <div className='container mx-auto px-4'>
-        <div className='text-center mb-12'>
-          <div className='inline-flex items-center gap-2'>
-            <h1 className='text-2xl font-bold'>CONTACT US</h1>
-            <hr className='border-none h-[2px] w-12 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto' />
-          </div>
-          <p className='mt-4 text-gray-700 text-lg font-light'>
-            Get in touch with Speed Clothing for any inquiries or support
-          </p>
+    <>
+      <PageHeader
+        eyebrow='Get in touch'
+        title='Contact'
+        highlight='us'
+        crumb='Contact'
+        subtitle='Questions about an order, sizing or anything else? We would love to hear from you.'
+      />
+
+      <section className='container-x grid gap-10 py-16 lg:grid-cols-[1fr_1.2fr] lg:py-24'>
+        {/* Info */}
+        <div className='grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-1'>
+          {CONTACT_INFO.map(({ icon: Icon, title, lines, href }) => {
+            const body = (
+              <>
+                <span className='grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-600 text-xl text-white shadow-glow'><Icon /></span>
+                <span>
+                  <span className='block text-xs font-semibold uppercase tracking-widest text-ink/40'>{title}</span>
+                  {lines.map((line) => <span key={line} className='mt-1 block font-medium'>{line}</span>)}
+                </span>
+              </>
+            )
+            return href ? (
+              <a key={title} href={href} className='card flex items-start gap-4 p-6 transition hover:-translate-y-1'>{body}</a>
+            ) : (
+              <div key={title} className='card flex items-start gap-4 p-6'>{body}</div>
+            )
+          })}
         </div>
 
-        <div className='flex flex-col md:flex-row gap-12'>
-          {/* Contact Form */}
-          <div className='md:w-1/2'>
-            <div className='bg-white rounded-2xl shadow-sm p-8'>
-              <h2 className='text-xl font-semibold mb-6'>Send us a message</h2>
-              <form onSubmit={onSubmitHandler} className='space-y-6'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>Full Name</label>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    required
-                    placeholder='Your name'
-                  />
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>Email Address</label>
-                  <input
-                    type="email"
-                    className={inputClass}
-                    required
-                    placeholder='your@email.com'
-                  />
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>Message</label>
-                  <textarea
-                    rows={4}
-                    className={inputClass}
-                    required
-                    placeholder='Your message...'
-                  />
-                </div>
-                <button
-                  type='submit'
-                  className='w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity'
-                >
-                  Send Message
-                </button>
-              </form>
-            </div>
-          </div>
+        {/* Form */}
+        <div className='card p-6 sm:p-10'>
+          <h2 className='heading text-3xl'>Send us a message</h2>
+          <p className='mt-2 text-ink/60'>We usually reply within one working day.</p>
 
-          {/* Contact Info */}
-          <div className='md:w-1/2'>
-            <div className='bg-white rounded-2xl shadow-sm p-8'>
-              <h2 className='text-xl font-semibold mb-6'>Our Store</h2>
-              <div className='space-y-6'>
-                <div className='flex items-start gap-4'>
-                  <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center'>
-                    <svg className='w-4 h-4 text-blue-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' />
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 11a3 3 0 11-6 0 3 3 0 016 0z' />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className='text-sm text-gray-600'>Our Location</p>
-                    <p className='text-gray-800'>Near Satellite Town, One Unit Chowk<br />Bahawalpur</p>
-                  </div>
-                </div>
-                <div className='flex items-start gap-4'>
-                  <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center'>
-                    <svg className='w-4 h-4 text-blue-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className='text-sm text-gray-600'>Contact Us</p>
-                    <p className='text-gray-800'>Tel: (+92) 3039219730<br />Email: Speedclothing@gmail.com</p>
-                  </div>
-                </div>
-                <div className='flex items-start gap-4'>
-                  <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center'>
-                    <svg className='w-4 h-4 text-blue-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className='text-sm text-gray-600'>Store Hours</p>
-                    <p className='text-gray-800'>Monday - Friday: 9:00 AM - 6:00 PM<br />Saturday: 10:00 AM - 5:00 PM<br />Sunday: Closed</p>
-                  </div>
-                </div>
+          <form onSubmit={onSubmitHandler} className='mt-8 space-y-5'>
+            <div className='grid gap-5 sm:grid-cols-2'>
+              <div>
+                <label htmlFor='contact-name' className='label'>Full name</label>
+                <input id='contact-name' type='text' className='input py-3.5' placeholder='Your name' required />
+              </div>
+              <div>
+                <label htmlFor='contact-email' className='label'>Email address</label>
+                <input id='contact-email' type='email' className='input py-3.5' placeholder='you@example.com' required />
               </div>
             </div>
-          </div>
+            <div>
+              <label htmlFor='contact-message' className='label'>Message</label>
+              <textarea id='contact-message' rows={6} className='input resize-none py-3.5' placeholder='How can we help?' required />
+            </div>
+            <button type='submit' className='btn-primary w-full py-4 sm:w-auto'>
+              Send message <FiSend />
+            </button>
+          </form>
         </div>
+      </section>
 
-        <div className='mt-12'></div>
-
-        <NewsletterBox/>
-      </div>
-    </div>
+      <section className='container-x pb-24'>
+        <NewsletterBox />
+      </section>
+    </>
   )
 }
 

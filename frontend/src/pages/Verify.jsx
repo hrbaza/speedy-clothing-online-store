@@ -28,8 +28,9 @@ const Verify = () => {
     }, [token])
 
     return (
-        <div className='min-h-[60vh] flex items-center justify-center'>
-            <p className='text-gray-600'>Verifying your payment...</p>
+        <div className='flex min-h-[60vh] flex-col items-center justify-center gap-6'>
+            <span className='h-14 w-14 animate-spin rounded-full border-4 border-brand-100 border-t-brand-600' />
+            <p className='heading text-xl'>Verifying your payment...</p>
         </div>
     )
 }

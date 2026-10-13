@@ -1,10 +1,11 @@
-import React from 'react'
-
-const Title = ({text1,text2}) => {
+// Small two-tone heading used inside cards and secondary sections
+const Title = ({ text1, text2 }) => {
   return (
-    <div className='inline-flex gap-2 items-center mb-3'>
-      <p className='text-gray-500'>{text1} <span className='text-gray-700 font-medium'>{text2}</span></p>
-      <div className='w-8 sm:w-12 h-[1px] sm:h-[2px] bg-gradient-to-r from-blue-500 to-indigo-500'></div>
+    <div className='mb-4 flex items-center gap-3'>
+      <span className='h-6 w-1.5 -skew-x-12 rounded-sm bg-gradient-to-b from-brand-500 to-brand-700' />
+      <h2 className='heading text-xl sm:text-2xl'>
+        <span className='text-ink/50'>{text1}</span> <span className='text-ink'>{text2}</span>
+      </h2>
     </div>
   )
 }

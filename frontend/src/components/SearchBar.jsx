@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { useLocation } from 'react-router-dom';
+import { FiSearch, FiX } from 'react-icons/fi'
 import { ShopContext } from '../context/ShopContext'
-import { assets } from '../assets/assets';
 
 const SearchBar = () => {
 
@@ -12,12 +12,27 @@ const SearchBar = () => {
   if (!showSearch || !pathname.includes('collection')) return null;
 
   return (
-    <div className='border-t border-b bg-gray-50 text-center'>
-      <div className='inline-flex items-center justify-center border border-gray-400 px-5 py-2 my-5 mx-3 rounded-full w-3/4 sm:w-1/2'>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} className='flex-1 outline-none bg-inherit text-sm' type="text" placeholder='Search' autoFocus />
-        <img className='w-4' src={assets.search_icon} alt="" />
+    <div className='border-b border-ink/5 bg-ink/[0.02]'>
+      <div className='container-x flex items-center gap-3 py-4'>
+        <div className='flex flex-1 items-center gap-3 rounded-full border border-ink/10 bg-white px-5 py-3 shadow-soft focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/15'>
+          <FiSearch className='text-ink/40' />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className='flex-1 bg-transparent text-sm outline-none'
+            type="text"
+            placeholder='Search for T-shirts, hoodies, jackets...'
+            autoFocus
+          />
+        </div>
+        <button
+          onClick={() => { setShowSearch(false); setSearch('') }}
+          className='grid h-11 w-11 place-items-center rounded-full bg-ink text-white transition hover:bg-brand-600'
+          aria-label="Close search"
+        >
+          <FiX />
+        </button>
       </div>
-      <img onClick={() => setShowSearch(false)} className='inline w-3 cursor-pointer' src={assets.cross_icon} alt="Close search" />
     </div>
   )
 }

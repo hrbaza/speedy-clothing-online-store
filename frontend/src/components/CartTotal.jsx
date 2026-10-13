@@ -1,11 +1,11 @@
 import { useContext } from 'react';
-import { ShopContext } from '../context/ShopContext';
-import Title from './Title';
+import { FiArrowRight, FiLock } from 'react-icons/fi';
 import { toast } from 'react-toastify';
+import { ShopContext } from '../context/ShopContext';
 
-const CartTotal = () => {
-  const { currency, delivery_fee, getCartAmount, navigate } = useContext(ShopContext);
-
+// Order summary card. `showCheckout` adds the "Proceed to checkout" button (used on the cart page)
+const CartTotal = ({ showCheckout = false }) => {
+  const { currency, delivery_fee, getCartAmount, getCartCount, navigate } = useContext(ShopContext);
   const subtotal = getCartAmount();
 
   const handleCheckout = () => {
@@ -13,54 +13,40 @@ const CartTotal = () => {
       toast.error('Your cart is empty');
       return;
     }
-
     navigate('/place-order');
   };
 
+  const rows = [
+    { label: `Subtotal (${getCartCount()} items)`, value: subtotal },
+    { label: 'Shipping', value: delivery_fee },
+  ];
+
   return (
-    <div className="w-full bg-white rounded-xl p-6 shadow-lg">
-      <div className="text-2xl mb-4">
-        <Title text1={'CART'} text2={'TOTALS'} />
-      </div>
+    <div className="card p-6 sm:p-8">
+      <h2 className="heading text-xl">Order summary</h2>
 
-      <div className="flex flex-col gap-4">
-        {/* Subtotal */}
-        <div className="flex justify-between text-gray-600">
-          <p>Subtotal</p>
-          <p>
-            {currency}
-            {subtotal.toFixed(2)}
-          </p>
+      <dl className="mt-6 space-y-4 text-sm">
+        {rows.map(({ label, value }) => (
+          <div key={label} className="flex justify-between text-ink/60">
+            <dt>{label}</dt>
+            <dd className="font-medium text-ink">{currency}{value.toFixed(2)}</dd>
+          </div>
+        ))}
+        <div className="flex items-end justify-between border-t border-dashed border-ink/15 pt-5">
+          <dt className="font-semibold">Total</dt>
+          <dd className="font-display text-3xl font-black">{currency}{(subtotal + delivery_fee).toFixed(2)}</dd>
         </div>
-        <hr className="border-gray-200" />
+      </dl>
 
-        {/* Shipping Fee */}
-        <div className="flex justify-between text-gray-600">
-          <p>Shipping Fee</p>
-          <p>
-            {currency}
-            {delivery_fee.toFixed(2)}
-          </p>
-        </div>
-        <hr className="border-gray-200" />
+      {showCheckout && (
+        <button onClick={handleCheckout} disabled={subtotal === 0} className="btn-primary group mt-8 w-full py-4">
+          Proceed to checkout <FiArrowRight className="transition group-hover:translate-x-1" />
+        </button>
+      )}
 
-        {/* Total */}
-        <div className="flex justify-between font-semibold">
-          <p>Total</p>
-          <p>
-            {currency}
-            {(subtotal + delivery_fee).toFixed(2)}
-          </p>
-        </div>
-      </div>
-
-      {/* Checkout Button */}
-      <button
-        onClick={handleCheckout}
-        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors mt-4"
-      >
-        Proceed to Checkout
-      </button>
+      <p className="mt-5 flex items-center justify-center gap-2 text-xs text-ink/50">
+        <FiLock /> Secure checkout · Cash on delivery available
+      </p>
     </div>
   );
 };

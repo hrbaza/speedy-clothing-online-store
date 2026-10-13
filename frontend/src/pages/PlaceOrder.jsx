@@ -1,12 +1,25 @@
 import { useContext, useState } from 'react'
-import Title from '../components/Title'
+import { FiLock, FiTruck, FiCreditCard, FiCheck } from 'react-icons/fi'
+import PageHeader from '../components/PageHeader'
 import CartTotal from '../components/CartTotal'
 import { assets } from '../assets/assets'
 import { ShopContext, errorMessage } from '../context/ShopContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 
-const inputClass = 'border border-gray-300 rounded py-1.5 px-3.5 w-full'
+const FIELDS = [
+    [{ name: 'firstName', label: 'First name', required: true }, { name: 'lastName', label: 'Last name', required: true }],
+    [{ name: 'email', label: 'Email address', type: 'email', required: true }],
+    [{ name: 'phone', label: 'Phone', type: 'tel', required: true }],
+    [{ name: 'street', label: 'Street address', required: true }],
+    [{ name: 'city', label: 'City', required: true }, { name: 'state', label: 'State / Province' }],
+    [{ name: 'zipcode', label: 'Zip code', inputMode: 'numeric', required: true }, { name: 'country', label: 'Country', required: true }],
+]
+
+const PAYMENT_METHODS = [
+    { id: 'cod', title: 'Cash on delivery', text: 'Pay when your order arrives', icon: FiTruck },
+    { id: 'stripe', title: 'Card payment', text: 'Secure checkout with Stripe', icon: FiCreditCard, logo: true },
+]
 
 const PlaceOrder = () => {
 
@@ -124,64 +137,101 @@ const PlaceOrder = () => {
 
 
     return (
-        <form onSubmit={onSubmitHandler} className='flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t'>
-            {/* ------------- Left Side ---------------- */}
-            <div className='flex flex-col gap-4 w-full sm:max-w-[480px]'>
+        <>
+            <PageHeader eyebrow='Final step' title='Check' highlight='out' crumb='Checkout' />
 
-                <div className='text-xl sm:text-2xl my-3'>
-                    <Title text1={'DELIVERY'} text2={'INFORMATION'} />
-                </div>
-                <div className='flex gap-3'>
-                    <input required onChange={onChangeHandler} name='firstName' value={formData.firstName} className={inputClass} type="text" placeholder='First name' />
-                    <input required onChange={onChangeHandler} name='lastName' value={formData.lastName} className={inputClass} type="text" placeholder='Last name' />
-                </div>
-                <input required onChange={onChangeHandler} name='email' value={formData.email} className={inputClass} type="email" placeholder='Email address' />
-                <input required onChange={onChangeHandler} name='street' value={formData.street} className={inputClass} type="text" placeholder='Street' />
-                <div className='flex gap-3'>
-                    <input required onChange={onChangeHandler} name='city' value={formData.city} className={inputClass} type="text" placeholder='City' />
-                    <input onChange={onChangeHandler} name='state' value={formData.state} className={inputClass} type="text" placeholder='State' />
-                </div>
-                <div className='flex gap-3'>
-                    <input required onChange={onChangeHandler} name='zipcode' value={formData.zipcode} className={inputClass} type="text" inputMode="numeric" placeholder='Zipcode' />
-                    <input required onChange={onChangeHandler} name='country' value={formData.country} className={inputClass} type="text" placeholder='Country' />
-                </div>
-                <input required onChange={onChangeHandler} name='phone' value={formData.phone} className={inputClass} type="tel" placeholder='Phone' />
-            </div>
+            <form onSubmit={onSubmitHandler} className='container-x grid gap-10 py-12 lg:grid-cols-[1fr_400px] lg:py-16'>
+                <div className='space-y-8'>
+                    {/* Delivery details */}
+                    <section className='card p-6 sm:p-8'>
+                        <div className='flex items-center gap-3'>
+                            <span className='grid h-9 w-9 place-items-center rounded-full bg-ink font-display text-sm font-bold text-white'>1</span>
+                            <h2 className='heading text-xl'>Delivery information</h2>
+                        </div>
+                        <div className='mt-8 space-y-4'>
+                            {FIELDS.map((row, i) => (
+                                <div key={i} className={`grid gap-4 ${row.length > 1 ? 'sm:grid-cols-2' : ''}`}>
+                                    {row.map(({ name, label, type = 'text', required, inputMode }) => (
+                                        <div key={name}>
+                                            <label htmlFor={name} className='label'>{label}{required && ' *'}</label>
+                                            <input
+                                                id={name}
+                                                name={name}
+                                                type={type}
+                                                inputMode={inputMode}
+                                                required={required}
+                                                value={formData[name]}
+                                                onChange={onChangeHandler}
+                                                className='input'
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                    </section>
 
-            {/* ------------- Right Side ------------------ */}
-            <div className='mt-8'>
+                    {/* Payment method */}
+                    <section className='card p-6 sm:p-8'>
+                        <div className='flex items-center gap-3'>
+                            <span className='grid h-9 w-9 place-items-center rounded-full bg-ink font-display text-sm font-bold text-white'>2</span>
+                            <h2 className='heading text-xl'>Payment method</h2>
+                        </div>
+                        <div className='mt-8 grid gap-4 sm:grid-cols-2'>
+                            {PAYMENT_METHODS.map(({ id, title, text, icon: Icon, logo }) => {
+                                const active = method === id
+                                return (
+                                    <button
+                                        type='button'
+                                        key={id}
+                                        onClick={() => setMethod(id)}
+                                        className={`relative flex items-start gap-4 rounded-2xl border-2 p-5 text-left transition ${active ? 'border-brand-600 bg-brand-50/60' : 'border-ink/10 hover:border-ink/30'}`}
+                                    >
+                                        <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl text-lg ${active ? 'bg-brand-600 text-white' : 'bg-ink/5'}`}>
+                                            <Icon />
+                                        </span>
+                                        <span>
+                                            <span className='block font-semibold'>{title}</span>
+                                            <span className='mt-0.5 block text-xs text-ink/50'>{text}</span>
+                                            {logo && <img className='mt-3 h-5' src={assets.stripe_logo} alt='Stripe' />}
+                                        </span>
+                                        {active && (
+                                            <span className='absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-brand-600 text-xs text-white'><FiCheck /></span>
+                                        )}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </section>
+                </div>
 
-                <div className='mt-8 min-w-120'>
+                {/* Summary */}
+                <aside className='space-y-4 lg:sticky lg:top-28 lg:self-start'>
+                    <div className='card p-6'>
+                        <h2 className='heading text-sm tracking-widest text-ink/50'>Items ({cartLines.length})</h2>
+                        <ul className='mt-4 max-h-64 space-y-4 overflow-y-auto'>
+                            {cartLines.map(({ product, size, quantity }) => (
+                                <li key={`${product._id}-${size}`} className='flex items-center gap-3'>
+                                    <div className='h-16 w-14 shrink-0 overflow-hidden rounded-xl bg-[#f3f4f7]'>
+                                        <img src={product.image[0]} alt={product.name} className='h-full w-full object-cover' />
+                                    </div>
+                                    <div className='min-w-0 flex-1'>
+                                        <p className='truncate text-sm font-medium'>{product.name}</p>
+                                        <p className='text-xs text-ink/50'>Size {size} · Qty {quantity}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
                     <CartTotal />
-                </div>
 
-                <div className='mt-12'>
-                    <Title text1={'PAYMENT'} text2={'METHOD'} />
-                    {/* --------------- Payment Method Selection ------------- */}
-                    <div className='flex gap-3 flex-col lg:flex-row justify-evenly'>
-                        <div onClick={() => setMethod('stripe')} className='flex items-center gap-3 border p-2 px-3 cursor-pointer'>
-                            <p className={`min-w-3.5 h-3.5 border rounded-full ${method === 'stripe' ? 'bg-green-400' : ''}`}></p>
-                            <img className='h-5 mx-4' src={assets.stripe_logo} alt="Stripe" />
-                        </div>
-                        {/* Invisible spacer that keeps the two options apart (Razorpay option is hidden) */}
-                        <div className='flex items-center gap-3 border p-2 px-3 opacity-0 pointer-events-none'>
-                            <p className='min-w-3.5 h-3.5 border rounded-full'></p>
-                            <div className='h-5 mx-4'></div>
-                        </div>
-                        <div onClick={() => setMethod('cod')} className='flex items-center gap-3 border p-2 px-3 cursor-pointer'>
-                            <p className={`min-w-3.5 h-3.5 border rounded-full ${method === 'cod' ? 'bg-green-400' : ''}`}></p>
-                            <p className='text-gray-500 text-sm font-medium mx-4'>CASH ON DELIVERY</p>
-                        </div>
-                    </div>
-
-                    <div className='w-full text-end mt-8'>
-                        <button type='submit' disabled={submitting} className='bg-black text-white px-16 py-3 text-sm disabled:opacity-50'>
-                            {submitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </form>
+                    <button type='submit' disabled={submitting} className='btn-primary w-full py-4'>
+                        <FiLock /> {submitting ? 'Placing order...' : 'Place order'}
+                    </button>
+                </aside>
+            </form>
+        </>
     )
 }
 

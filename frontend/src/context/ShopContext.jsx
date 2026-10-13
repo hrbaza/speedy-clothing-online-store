@@ -18,6 +18,7 @@ const ShopContextProvider = (props) => {
     const [showSearch, setShowSearch] = useState(false);
     const [cartItems, setCartItems] = useState({});
     const [products, setProducts] = useState([]);
+    const [productsLoading, setProductsLoading] = useState(true);
     const [token, setTokenState] = useState(() => localStorage.getItem('token') || '')
     const navigate = useNavigate();
 
@@ -108,6 +109,8 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             toast.error(errorMessage(error))
+        } finally {
+            setProductsLoading(false)
         }
     }
 
@@ -138,7 +141,7 @@ const ShopContextProvider = (props) => {
     }, [token])
 
     const value = {
-        products, currency, delivery_fee,
+        products, productsLoading, currency, delivery_fee,
         search, setSearch, showSearch, setShowSearch,
         cartItems, cartLines, addToCart, setCartItems,
         getCartCount, updateQuantity,
