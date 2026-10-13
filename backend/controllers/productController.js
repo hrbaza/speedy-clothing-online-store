@@ -8,7 +8,7 @@ const sizeRank = (size) => (SIZE_ORDER.includes(size) ? SIZE_ORDER.indexOf(size)
 // function for add product
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, subCategory, sizes, bestseller } = req.body
+        const { name, description, price, category, subCategory, sizes, bestseller, inStock } = req.body
 
         const images = IMAGE_FIELDS
             .map((field) => req.files?.[field]?.[0])
@@ -32,6 +32,7 @@ const addProduct = async (req, res) => {
             price: Number(price),
             subCategory,
             bestseller: bestseller === "true",
+            inStock: inStock !== "false",
             sizes: JSON.parse(sizes).sort((a, b) => sizeRank(a) - sizeRank(b)),
             image: imagesUrl,
             date: Date.now()
@@ -66,6 +67,26 @@ const removeProduct = async (req, res) => {
     }
 }
 
+// function for marking a product in stock / out of stock (admin)
+const updateStock = async (req, res) => {
+    try {
+        const { id, inStock } = req.body
+        if (typeof inStock !== 'boolean') {
+            return res.status(400).json({ success: false, message: "inStock must be true or false" })
+        }
+
+        const product = await productModel.findByIdAndUpdate(id, { inStock }, { new: true })
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found" })
+        }
+
+        res.json({ success: true, message: inStock ? "Marked as in stock" : "Marked as out of stock", product })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ success: false, message: error.message })
+    }
+}
+
 // function for single product info
 const singleProduct = async (req, res) => {
     try {
@@ -80,4 +101,4 @@ const singleProduct = async (req, res) => {
     }
 }
 
-export { listProducts, addProduct, removeProduct, singleProduct }
+export { listProducts, addProduct, removeProduct, singleProduct, updateStock }

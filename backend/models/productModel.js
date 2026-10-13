@@ -9,6 +9,7 @@ const productSchema = new mongoose.Schema({
     subCategory: { type: String, required: true },
     sizes: { type: [String], required: true },
     bestseller: { type: Boolean, required: true },
+    inStock: { type: Boolean, default: true }, // older products without this field count as in stock
     date: { type: Date, required: true }
 });
 

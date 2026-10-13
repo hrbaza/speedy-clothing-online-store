@@ -1,7 +1,7 @@
 import { useContext, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FiSliders, FiX, FiSearch, FiChevronDown } from 'react-icons/fi';
-import { ShopContext } from '../context/ShopContext';
+import { ShopContext, isInStock } from '../context/ShopContext';
 import PageHeader from '../components/PageHeader';
 import ProductGrid from '../components/ProductGrid';
 
@@ -24,6 +24,7 @@ const Collection = () => {
   const [params, setParams] = useSearchParams();
   const [showFilter, setShowFilter] = useState(false);
   const [sortType, setSortType] = useState('relevant');
+  const [inStockOnly, setInStockOnly] = useState(false);
 
   const selected = Object.fromEntries(FILTERS.map(({ param }) => [param, readList(params, param)]));
   const activeCount = selected.category.length + selected.type.length;
@@ -44,13 +45,14 @@ const Collection = () => {
 
     const filtered = products.filter((item) =>
       (!query || item.name.toLowerCase().includes(query)) &&
+      (!inStockOnly || isInStock(item)) &&
       FILTERS.every(({ param, field }) => selected[param].length === 0 || selected[param].includes(item[field]))
     );
 
     if (sortType === 'low-high') return filtered.sort((a, b) => a.price - b.price);
     if (sortType === 'high-low') return filtered.sort((a, b) => b.price - a.price);
     return filtered;
-  }, [products, search, showSearch, params, sortType]);
+  }, [products, search, showSearch, params, sortType, inStockOnly]);
 
   return (
     <>
@@ -90,6 +92,12 @@ const Collection = () => {
                 </div>
               </div>
             ))}
+
+            <label className='flex cursor-pointer items-center justify-between rounded-3xl border border-ink/10 px-6 py-5'>
+              <span className='heading text-sm tracking-widest'>In stock only</span>
+              <input type='checkbox' className='peer sr-only' checked={inStockOnly} onChange={() => setInStockOnly((prev) => !prev)} />
+              <span className='relative h-6 w-11 rounded-full bg-ink/15 transition after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:bg-brand-600 peer-checked:after:translate-x-5' />
+            </label>
 
             {activeCount > 0 && (
               <button onClick={clearFilters} className='btn-outline w-full'>

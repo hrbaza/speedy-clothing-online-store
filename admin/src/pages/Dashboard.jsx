@@ -25,9 +25,10 @@ const Dashboard = ({ token }) => {
 
   const revenue = orders.reduce((sum, order) => sum + (order.payment || order.status === 'Delivered' ? order.amount : 0), 0)
   const pending = orders.filter((order) => order.status !== 'Delivered').length
+  const outOfStock = products.filter((product) => product.inStock === false).length
 
   const stats = [
-    { label: 'Total products', value: products.length, icon: FiBox, accent: 'from-brand-500 to-brand-700' },
+    { label: 'Total products', value: products.length, icon: FiBox, accent: 'from-brand-500 to-brand-700', sub: outOfStock > 0 ? `${outOfStock} out of stock` : 'All in stock' },
     { label: 'Total orders', value: orders.length, icon: FiShoppingCart, accent: 'from-ink to-ink-600' },
     { label: 'Revenue (paid)', value: formatMoney(revenue), icon: FiDollarSign, accent: 'from-emerald-500 to-emerald-700' },
     { label: 'Pending orders', value: pending, icon: FiClock, accent: 'from-amber-400 to-amber-600' },
@@ -50,7 +51,7 @@ const Dashboard = ({ token }) => {
 
       {/* Stats */}
       <section className='grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4'>
-        {stats.map(({ label, value, icon: Icon, accent }) => (
+        {stats.map(({ label, value, icon: Icon, accent, sub }) => (
           <div key={label} className='card p-4 sm:p-6'>
             <div className='flex items-start justify-between'>
               <p className='text-xs font-medium text-ink/50 sm:text-sm'>{label}</p>
@@ -59,6 +60,7 @@ const Dashboard = ({ token }) => {
             {loading
               ? <div className='mt-4 h-9 w-24 animate-pulse rounded-lg bg-ink/5' />
               : <p className='mt-4 truncate font-display text-xl font-black sm:text-3xl'>{value}</p>}
+            {sub && !loading && <p className={`mt-1 text-xs font-medium ${sub.includes('out of stock') ? 'text-red-600' : 'text-emerald-600'}`}>{sub}</p>}
           </div>
         ))}
       </section>
@@ -113,7 +115,10 @@ const Dashboard = ({ token }) => {
                   <img src={product.image[0]} alt={product.name} className='h-14 w-12 rounded-xl bg-ink/5 object-cover' />
                   <div className='min-w-0 flex-1'>
                     <p className='truncate text-sm font-semibold'>{product.name}</p>
-                    <p className='text-xs text-ink/50'>{product.category} · {product.subCategory}</p>
+                    <p className='text-xs text-ink/50'>
+                      {product.category} · {product.subCategory}
+                      {product.inStock === false && <span className='ml-2 font-semibold text-red-600'>Out of stock</span>}
+                    </p>
                   </div>
                   <p className='font-display font-bold'>{formatMoney(product.price)}</p>
                 </li>

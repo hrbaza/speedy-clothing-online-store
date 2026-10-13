@@ -26,6 +26,9 @@ const createOrder = async (userId, { items, address }) => {
         if (!product || !size || !Number.isInteger(quantity) || quantity < 1) {
             throw new Error('Cart contains an invalid item')
         }
+        if (product.inStock === false) {
+            throw new Error(`${product.name} is out of stock. Please remove it from your cart.`)
+        }
         const { name, price, image, category, subCategory } = product
         return { _id: product._id, name, price, image, category, subCategory, size, quantity }
     })

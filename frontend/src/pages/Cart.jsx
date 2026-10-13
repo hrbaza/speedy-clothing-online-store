@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { FiMinus, FiPlus, FiTrash2, FiShoppingBag, FiArrowLeft } from 'react-icons/fi';
-import { ShopContext } from '../context/ShopContext';
+import { FiMinus, FiPlus, FiTrash2, FiShoppingBag, FiArrowLeft, FiAlertTriangle } from 'react-icons/fi';
+import { ShopContext, isInStock } from '../context/ShopContext';
 import PageHeader from '../components/PageHeader';
 import CartTotal from '../components/CartTotal';
 
@@ -27,7 +27,7 @@ const Cart = () => {
             <div>
               <div className='space-y-4'>
                 {cartLines.map(({ product, size, quantity }) => (
-                  <div key={`${product._id}-${size}`} className='card flex gap-4 p-4 sm:gap-6 sm:p-5'>
+                  <div key={`${product._id}-${size}`} className={`card flex gap-4 p-4 sm:gap-6 sm:p-5 ${isInStock(product) ? '' : 'ring-2 ring-red-200'}`}>
                     <Link to={`/product/${product._id}`} className='h-28 w-24 shrink-0 overflow-hidden rounded-2xl bg-[#f3f4f7] sm:h-32 sm:w-28'>
                       <img src={product.image[0]} className='h-full w-full object-cover' alt={product.name} />
                     </Link>
@@ -38,6 +38,11 @@ const Cart = () => {
                           <p className='text-[11px] font-semibold uppercase tracking-[0.2em] text-ink/40'>{product.category}</p>
                           <Link to={`/product/${product._id}`} className='mt-1 block truncate font-semibold hover:text-brand-600'>{product.name}</Link>
                           <span className='mt-2 inline-block rounded-lg bg-ink/5 px-2.5 py-1 text-xs font-semibold'>Size {size}</span>
+                          {!isInStock(product) && (
+                            <p className='mt-2 flex items-center gap-1.5 text-xs font-semibold text-red-600'>
+                              <FiAlertTriangle /> Out of stock — please remove to continue
+                            </p>
+                          )}
                         </div>
                         <button
                           onClick={() => updateQuantity(product._id, size, 0)}

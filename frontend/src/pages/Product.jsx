@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FaStar } from 'react-icons/fa'
-import { FiChevronRight, FiShoppingBag, FiZap, FiTruck, FiRefreshCw, FiCheckCircle } from 'react-icons/fi'
-import { ShopContext } from '../context/ShopContext';
+import { FiChevronRight, FiShoppingBag, FiZap, FiTruck, FiRefreshCw, FiCheckCircle, FiXCircle } from 'react-icons/fi'
+import { ShopContext, isInStock } from '../context/ShopContext';
 import RelatedProducts from '../components/RelatedProducts';
 
 const RATING = 4
@@ -50,6 +50,8 @@ const Product = () => {
     )
   }
 
+  const inStock = isInStock(productData)
+
   const buyNow = () => {
     if (!size) {
       addToCart(productData._id, size) // shows the "select size" message
@@ -86,7 +88,12 @@ const Product = () => {
               ))}
             </div>
             <div className='relative flex-1 overflow-hidden rounded-3xl bg-[#f3f4f7]'>
-              <img className='aspect-[4/5] h-full w-full object-cover' src={image} alt={productData.name} />
+              <img className={`aspect-[4/5] h-full w-full object-cover ${inStock ? '' : 'opacity-60 grayscale'}`} src={image} alt={productData.name} />
+              {!inStock && (
+                <span className='absolute right-4 top-4 -skew-x-12 rounded-md bg-red-600 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white'>
+                  <span className='inline-block skew-x-12'>Out of stock</span>
+                </span>
+              )}
               {productData.bestseller && (
                 <span className='absolute left-4 top-4 -skew-x-12 rounded-md bg-ink px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white'>
                   <span className='inline-block skew-x-12'>Bestseller</span>
@@ -107,7 +114,18 @@ const Product = () => {
               <span className='text-sm text-ink/50'>({REVIEW_COUNT} reviews)</span>
             </div>
 
-            <p className='mt-6 font-display text-4xl font-black'>{currency}{productData.price}</p>
+            <div className='mt-6 flex flex-wrap items-center gap-4'>
+              <p className='font-display text-4xl font-black'>{currency}{productData.price}</p>
+              {inStock ? (
+                <span className='inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20'>
+                  <span className='h-1.5 w-1.5 rounded-full bg-emerald-500' /> In stock
+                </span>
+              ) : (
+                <span className='inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-600/20'>
+                  <span className='h-1.5 w-1.5 rounded-full bg-red-500' /> Out of stock
+                </span>
+              )}
+            </div>
             <p className='mt-6 leading-relaxed text-ink/60'>{productData.description}</p>
 
             <div className='mt-10'>
@@ -120,7 +138,8 @@ const Product = () => {
                   <button
                     key={item}
                     onClick={() => setSize(item)}
-                    className={`h-12 min-w-12 rounded-xl border px-4 text-sm font-semibold transition ${item === size ? 'border-brand-600 bg-brand-600 text-white shadow-glow' : 'border-ink/15 hover:border-ink'}`}
+                    disabled={!inStock}
+                    className={`h-12 min-w-12 rounded-xl border px-4 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${item === size ? 'border-brand-600 bg-brand-600 text-white shadow-glow' : 'border-ink/15 hover:border-ink'}`}
                   >
                     {item}
                   </button>
@@ -128,14 +147,25 @@ const Product = () => {
               </div>
             </div>
 
-            <div className='mt-10 flex flex-col gap-3 sm:flex-row'>
-              <button onClick={() => addToCart(productData._id, size)} className='btn-primary flex-1 py-4'>
-                <FiShoppingBag /> Add to cart
-              </button>
-              <button onClick={buyNow} className='btn-dark flex-1 py-4'>
-                <FiZap /> Buy now
-              </button>
-            </div>
+            {inStock ? (
+              <div className='mt-10 flex flex-col gap-3 sm:flex-row'>
+                <button onClick={() => addToCart(productData._id, size)} className='btn-primary flex-1 py-4'>
+                  <FiShoppingBag /> Add to cart
+                </button>
+                <button onClick={buyNow} className='btn-dark flex-1 py-4'>
+                  <FiZap /> Buy now
+                </button>
+              </div>
+            ) : (
+              <div className='mt-10'>
+                <button disabled className='btn w-full cursor-not-allowed bg-ink/10 py-4 text-ink/50'>
+                  <FiXCircle /> Out of stock
+                </button>
+                <p className='mt-3 text-center text-sm text-ink/50'>
+                  This item is currently unavailable. <Link to={`/collection?category=${productData.category}`} className='font-semibold text-brand-600 hover:underline'>See similar products</Link>
+                </p>
+              </div>
+            )}
 
             <div className='mt-10 grid gap-3 sm:grid-cols-3'>
               {PERKS.map(({ icon: Icon, title, text }) => (

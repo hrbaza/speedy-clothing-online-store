@@ -19,6 +19,7 @@ const Add = ({ token }) => {
   const [category, setCategory] = useState(CATEGORIES[0])
   const [subCategory, setSubCategory] = useState(SUB_CATEGORIES[0])
   const [bestseller, setBestseller] = useState(false)
+  const [inStock, setInStock] = useState(true)
   const [sizes, setSizes] = useState([])
   const [submitting, setSubmitting] = useState(false)
 
@@ -39,6 +40,7 @@ const Add = ({ token }) => {
     setPrice('')
     setSizes([])
     setBestseller(false)
+    setInStock(true)
   }
 
   const onSubmitHandler = async (e) => {
@@ -60,6 +62,7 @@ const Add = ({ token }) => {
     formData.append('category', category)
     formData.append('subCategory', subCategory)
     formData.append('bestseller', bestseller)
+    formData.append('inStock', inStock)
     formData.append('sizes', JSON.stringify(sortSizes(sizes)))
     images.forEach((file, i) => file && formData.append(`image${i + 1}`, file))
 
@@ -199,6 +202,15 @@ const Add = ({ token }) => {
             </span>
             <input onChange={() => setBestseller((prev) => !prev)} checked={bestseller} type="checkbox" id='bestseller' className='peer sr-only' />
             <span className='relative h-7 w-12 rounded-full bg-ink/15 transition after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:bg-brand-600 peer-checked:after:translate-x-5' />
+          </label>
+
+          <label htmlFor='inStock' className='flex cursor-pointer items-center justify-between rounded-2xl border border-ink/10 p-4'>
+            <span>
+              <span className='block text-sm font-semibold'>In stock</span>
+              <span className='text-xs text-ink/50'>Turn off to show the product as out of stock</span>
+            </span>
+            <input onChange={() => setInStock((prev) => !prev)} checked={inStock} type="checkbox" id='inStock' className='peer sr-only' />
+            <span className='relative h-7 w-12 rounded-full bg-ink/15 transition after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:bg-emerald-500 peer-checked:after:translate-x-5' />
           </label>
         </section>
 

@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
 import { FiLock, FiTruck, FiCheck } from 'react-icons/fi'
 import PageHeader from '../components/PageHeader'
 import CartTotal from '../components/CartTotal'
-import { ShopContext, errorMessage } from '../context/ShopContext'
+import { ShopContext, errorMessage, isInStock } from '../context/ShopContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 
@@ -46,6 +46,11 @@ const PlaceOrder = () => {
         }
         if (cartLines.length === 0) {
             toast.error('Your cart is empty')
+            return
+        }
+        if (cartLines.some(({ product }) => !isInStock(product))) {
+            toast.error('Some items are out of stock. Please remove them from your cart.')
+            navigate('/cart')
             return
         }
 

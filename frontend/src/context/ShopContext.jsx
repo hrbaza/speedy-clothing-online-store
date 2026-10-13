@@ -17,6 +17,9 @@ const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
 const sizeRank = (size) => (SIZE_ORDER.includes(size) ? SIZE_ORDER.indexOf(size) : SIZE_ORDER.length)
 export const sortSizes = (sizes) => [...sizes].sort((a, b) => sizeRank(a) - sizeRank(b))
 
+// Products saved before the stock option existed have no inStock field and count as in stock
+export const isInStock = (product) => product?.inStock !== false
+
 const ShopContextProvider = (props) => {
 
     const [search, setSearch] = useState('');
@@ -39,6 +42,10 @@ const ShopContextProvider = (props) => {
     }
 
     const addToCart = async (itemId, size) => {
+        if (!isInStock(products.find((product) => product._id === itemId))) {
+            toast.error('Sorry, this product is out of stock');
+            return;
+        }
         if (!size) {
             toast.error('Select Product Size');
             return;

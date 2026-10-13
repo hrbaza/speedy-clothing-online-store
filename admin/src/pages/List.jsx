@@ -5,13 +5,36 @@ import { toast } from 'react-toastify'
 import { FiSearch, FiTrash2, FiPlus, FiBox, FiStar } from 'react-icons/fi'
 import { authHeaders, backendUrl, errorMessage, formatMoney, sortSizes } from '../config'
 
-const TABS = ['All', 'Men', 'Women', 'Kids']
+const TABS = ['All', 'Men', 'Women', 'Kids', 'Out of stock']
+
+// Products saved before the stock option existed have no inStock field and count as in stock
+const isInStock = (product) => product.inStock !== false
+const matchesTab = (product, tab) =>
+  tab === 'All' || (tab === 'Out of stock' ? !isInStock(product) : product.category === tab)
+
+// Pill switch that flips a product between in stock and out of stock
+const StockToggle = ({ inStock, onToggle, busy }) => (
+  <button
+    onClick={onToggle}
+    disabled={busy}
+    className={`inline-flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-xs font-semibold ring-1 ring-inset transition disabled:opacity-50 ${
+      inStock ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' : 'bg-red-50 text-red-700 ring-red-600/20'
+    }`}
+    title={inStock ? 'Click to mark out of stock' : 'Click to mark in stock'}
+  >
+    <span className={`relative h-5 w-9 rounded-full transition ${inStock ? 'bg-emerald-500' : 'bg-red-400'}`}>
+      <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${inStock ? 'left-[1.15rem]' : 'left-0.5'}`} />
+    </span>
+    {inStock ? 'In stock' : 'Out of stock'}
+  </button>
+)
 
 const List = ({ token }) => {
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState('')
   const [tab, setTab] = useState('All')
+  const [updatingId, setUpdatingId] = useState(null)
 
   const fetchList = async () => {
     try {
@@ -45,13 +68,31 @@ const List = ({ token }) => {
     }
   }
 
+  const toggleStock = async (product) => {
+    const inStock = !isInStock(product)
+    setUpdatingId(product._id)
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/product/stock`, { id: product._id, inStock }, { headers: authHeaders(token) })
+      if (data.success) {
+        toast.success(`${product.name}: ${data.message.toLowerCase()}`)
+        setList((prev) => prev.map((item) => (item._id === product._id ? { ...item, inStock } : item)))
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(errorMessage(error))
+    } finally {
+      setUpdatingId(null)
+    }
+  }
+
   useEffect(() => {
     fetchList()
   }, [])
 
   const search = query.trim().toLowerCase()
   const visible = list.filter((item) =>
-    (tab === 'All' || item.category === tab) &&
+    matchesTab(item, tab) &&
     (!search || item.name.toLowerCase().includes(search))
   )
 
@@ -68,7 +109,7 @@ const List = ({ token }) => {
             >
               {item}
               <span className={`ml-1.5 text-xs ${tab === item ? 'text-white/60' : 'text-ink/40'}`}>
-                {item === 'All' ? list.length : list.filter((p) => p.category === item).length}
+                {list.filter((p) => matchesTab(p, item)).length}
               </span>
             </button>
           ))}
@@ -84,11 +125,12 @@ const List = ({ token }) => {
 
       <div className='card overflow-hidden'>
         {/* Table header (desktop) */}
-        <div className='hidden grid-cols-[80px_3fr_1.2fr_1fr_80px] items-center gap-4 border-b border-ink/5 bg-ink/[0.02] px-6 py-4 text-xs font-semibold uppercase tracking-wider text-ink/50 md:grid'>
+        <div className='hidden grid-cols-[80px_3fr_1.2fr_1fr_1.3fr_56px] items-center gap-4 border-b border-ink/5 bg-ink/[0.02] px-6 py-4 text-xs font-semibold uppercase tracking-wider text-ink/50 md:grid'>
           <span>Image</span>
           <span>Product</span>
           <span>Category</span>
           <span>Price</span>
+          <span>Stock</span>
           <span className='text-right'>Action</span>
         </div>
 
@@ -103,8 +145,8 @@ const List = ({ token }) => {
         ) : (
           <ul className='divide-y divide-ink/5'>
             {visible.map((item) => (
-              <li key={item._id} className='grid grid-cols-[64px_1fr_auto] items-center gap-4 px-4 py-4 transition hover:bg-ink/[0.02] sm:px-6 md:grid-cols-[80px_3fr_1.2fr_1fr_80px]'>
-                <img className='h-20 w-16 rounded-xl bg-ink/5 object-cover md:w-20' src={item.image[0]} alt={item.name} />
+              <li key={item._id} className='grid grid-cols-[64px_1fr_auto] items-center gap-4 px-4 py-4 transition hover:bg-ink/[0.02] sm:px-6 md:grid-cols-[80px_3fr_1.2fr_1fr_1.3fr_56px]'>
+                <img className={`h-20 w-16 rounded-xl bg-ink/5 object-cover md:w-20 ${isInStock(item) ? '' : 'opacity-50 grayscale'}`} src={item.image[0]} alt={item.name} />
                 <div className='min-w-0'>
                   <p className='truncate font-semibold'>{item.name}</p>
                   <div className='mt-1 flex flex-wrap items-center gap-2 text-xs text-ink/50'>
@@ -112,12 +154,18 @@ const List = ({ token }) => {
                     {item.bestseller && <span className='badge bg-amber-50 text-amber-700 ring-amber-600/20'><FiStar /> Bestseller</span>}
                   </div>
                   <p className='mt-1 text-sm font-bold md:hidden'>{formatMoney(item.price)} · <span className='font-normal text-ink/50'>{item.category}</span></p>
+                  <div className='mt-2 md:hidden'>
+                    <StockToggle inStock={isInStock(item)} busy={updatingId === item._id} onToggle={() => toggleStock(item)} />
+                  </div>
                 </div>
                 <div className='hidden md:block'>
                   <span className='badge bg-ink/5 text-ink/70 ring-ink/10'>{item.category}</span>
                   <p className='mt-1 text-xs text-ink/40'>{item.subCategory}</p>
                 </div>
                 <p className='hidden font-display text-lg font-bold md:block'>{formatMoney(item.price)}</p>
+                <div className='hidden md:block'>
+                  <StockToggle inStock={isInStock(item)} busy={updatingId === item._id} onToggle={() => toggleStock(item)} />
+                </div>
                 <div className='text-right'>
                   <button
                     onClick={() => removeProduct(item._id)}
