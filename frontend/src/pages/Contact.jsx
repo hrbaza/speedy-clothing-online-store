@@ -4,8 +4,8 @@ import PageHeader from '../components/PageHeader'
 import NewsletterBox from '../components/NewsletterBox'
 
 const CONTACT_INFO = [
-  { icon: FiMapPin, title: 'Our location', lines: ['Near Satellite Town, One Unit Chowk', 'Bahawalpur'] },
-  { icon: FiPhone, title: 'Call us', lines: ['(+92) 303 921 9730'], href: 'tel:+923039219730' },
+  { icon: FiMapPin, title: 'Our location', lines: ['Bahawalpur, Pakistan'] },
+  { icon: FiPhone, title: 'Call us', lines: ['+92 62 123 4567'], href: 'tel:+92621234567' },
   { icon: FiMail, title: 'Email us', lines: ['Speedclothing@gmail.com'], href: 'mailto:Speedclothing@gmail.com' },
   { icon: FiClock, title: 'Store hours', lines: ['Mon – Fri: 9:00 AM – 6:00 PM', 'Sat: 10:00 AM – 5:00 PM · Sun: Closed'] },
 ]

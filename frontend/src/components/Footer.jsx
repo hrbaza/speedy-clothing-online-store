@@ -66,17 +66,17 @@ const Footer = () => {
           <h4 className="heading text-sm tracking-widest text-white/40">Get in touch</h4>
           <ul className="mt-6 space-y-4 text-white/75">
             <li>
-              <a href="tel:+923039219730" className="flex items-center gap-3 transition hover:text-white">
-                <FiPhone className="text-brand-400" /> +92 303 921 9730
+              <a href="tel:+92621234567" className="flex items-center gap-3 transition hover:text-white">
+                <FiPhone className="text-brand-400" /> +92 62 123 4567
               </a>
             </li>
             <li>
-              <a href="mailto:HamzaRashid@gmail.com" className="flex items-center gap-3 transition hover:text-white">
-                <FiMail className="text-brand-400" /> HamzaRashid@gmail.com
+              <a href="mailto:Speedclothing@gmail.com" className="flex items-center gap-3 transition hover:text-white">
+                <FiMail className="text-brand-400" /> Speedclothing@gmail.com
               </a>
             </li>
             <li className="flex items-start gap-3">
-              <FiMapPin className="mt-1 shrink-0 text-brand-400" /> Satellite Town, Bahawalpur
+              <FiMapPin className="mt-1 shrink-0 text-brand-400" /> Bahawalpur, Pakistan
             </li>
           </ul>
         </div>
