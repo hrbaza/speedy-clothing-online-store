@@ -16,7 +16,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-[3fr_1fr_1fr] gap-14">
         {/* Brand */}
         <div>
-          <img src={assets.logo} className="mb-6 w-36" alt="Speed Clothing" />
+          <img src={assets.logo} className="mb-6 w-44" alt="Speed Clothing" />
           <p className="mb-6 leading-relaxed text-gray-600">
             Where Speed Meets Style — Your Ultimate T-Shirt Destination
           </p>
