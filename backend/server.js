@@ -39,4 +39,9 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500).json({ success: false, message: err.message || 'Internal Server Error' })
 })
 
-app.listen(port, () => console.log('Server started on PORT : ' + port))
+// On Vercel the app is run as a serverless function, so it must not listen on a port
+if (!process.env.VERCEL) {
+    app.listen(port, () => console.log('Server started on PORT : ' + port))
+}
+
+export default app
