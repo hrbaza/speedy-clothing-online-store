@@ -1,5 +1,5 @@
 export const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
-export const currency = '$'
+export const currency = 'Rs'
 
 export const authHeaders = (token) => ({ Authorization: `Bearer ${token}` })
 
@@ -22,5 +22,6 @@ export const STATUS_STYLES = {
   Delivered: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
 }
 
+// Pakistani Rupees, e.g. 1299 -> "Rs 1,299"
 export const formatMoney = (value) =>
-  `${currency}${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  `${currency} ${Number(value || 0).toLocaleString('en-PK', { maximumFractionDigits: 2 })}`

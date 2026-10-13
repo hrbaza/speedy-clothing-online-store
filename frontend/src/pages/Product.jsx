@@ -29,7 +29,7 @@ const ProductSkeleton = () => (
 const Product = () => {
 
   const { productId } = useParams();
-  const { products, productsLoading, currency, addToCart, navigate } = useContext(ShopContext);
+  const { products, productsLoading, formatPrice, addToCart, navigate } = useContext(ShopContext);
   const productData = products.find((item) => item._id === productId);
   const [image, setImage] = useState('')
   const [size, setSize] = useState('')
@@ -115,7 +115,7 @@ const Product = () => {
             </div>
 
             <div className='mt-6 flex flex-wrap items-center gap-4'>
-              <p className='font-display text-4xl font-black'>{currency}{productData.price}</p>
+              <p className='font-display text-4xl font-black'>{formatPrice(productData.price)}</p>
               {inStock ? (
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20'>
                   <span className='h-1.5 w-1.5 rounded-full bg-emerald-500' /> In stock

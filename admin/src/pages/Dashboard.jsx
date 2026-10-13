@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { FiBox, FiShoppingCart, FiDollarSign, FiClock, FiPlus, FiArrowUpRight } from 'react-icons/fi'
+import { FiBox, FiShoppingCart, FiTrendingUp, FiClock, FiPlus, FiArrowUpRight } from 'react-icons/fi'
 import { authHeaders, backendUrl, errorMessage, formatMoney, STATUS_STYLES } from '../config'
 
 const Dashboard = ({ token }) => {
@@ -30,7 +30,7 @@ const Dashboard = ({ token }) => {
   const stats = [
     { label: 'Total products', value: products.length, icon: FiBox, accent: 'from-brand-500 to-brand-700', sub: outOfStock > 0 ? `${outOfStock} out of stock` : 'All in stock' },
     { label: 'Total orders', value: orders.length, icon: FiShoppingCart, accent: 'from-ink to-ink-600' },
-    { label: 'Revenue (paid)', value: formatMoney(revenue), icon: FiDollarSign, accent: 'from-emerald-500 to-emerald-700' },
+    { label: 'Revenue (paid)', value: formatMoney(revenue), icon: FiTrendingUp, accent: 'from-emerald-500 to-emerald-700' },
     { label: 'Pending orders', value: pending, icon: FiClock, accent: 'from-amber-400 to-amber-600' },
   ]
 

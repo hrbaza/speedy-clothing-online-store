@@ -6,7 +6,7 @@ import PageHeader from '../components/PageHeader';
 import CartTotal from '../components/CartTotal';
 
 const Cart = () => {
-  const { currency, cartLines, updateQuantity } = useContext(ShopContext);
+  const { formatPrice, cartLines, updateQuantity } = useContext(ShopContext);
 
   return (
     <>
@@ -71,7 +71,7 @@ const Cart = () => {
                             <FiPlus />
                           </button>
                         </div>
-                        <p className='font-display text-xl font-bold'>{currency}{(product.price * quantity).toFixed(2)}</p>
+                        <p className='font-display text-xl font-bold'>{formatPrice(product.price * quantity)}</p>
                       </div>
                     </div>
                   </div>

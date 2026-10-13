@@ -5,7 +5,7 @@ import { ShopContext, isInStock } from '../context/ShopContext';
 
 // Order summary card. `showCheckout` adds the "Proceed to checkout" button (used on the cart page)
 const CartTotal = ({ showCheckout = false }) => {
-  const { currency, delivery_fee, getCartAmount, getCartCount, navigate, cartLines } = useContext(ShopContext);
+  const { formatPrice, delivery_fee, getCartAmount, getCartCount, navigate, cartLines } = useContext(ShopContext);
   const subtotal = getCartAmount();
   const hasOutOfStock = cartLines.some(({ product }) => !isInStock(product));
 
@@ -34,12 +34,12 @@ const CartTotal = ({ showCheckout = false }) => {
         {rows.map(({ label, value }) => (
           <div key={label} className="flex justify-between text-ink/60">
             <dt>{label}</dt>
-            <dd className="font-medium text-ink">{currency}{value.toFixed(2)}</dd>
+            <dd className="font-medium text-ink">{formatPrice(value)}</dd>
           </div>
         ))}
         <div className="flex items-end justify-between border-t border-dashed border-ink/15 pt-5">
           <dt className="font-semibold">Total</dt>
-          <dd className="font-display text-3xl font-black">{currency}{(subtotal + delivery_fee).toFixed(2)}</dd>
+          <dd className="font-display text-3xl font-black">{formatPrice(subtotal + delivery_fee)}</dd>
         </div>
       </dl>
 

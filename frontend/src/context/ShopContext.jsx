@@ -5,7 +5,11 @@ import axios from 'axios'
 
 export const ShopContext = createContext();
 
-const currency = '$';
+const currency = 'Rs';
+
+// Pakistani Rupees, e.g. 1299 -> "Rs 1,299"
+export const formatPrice = (value) =>
+    `${currency} ${Number(value || 0).toLocaleString('en-PK', { maximumFractionDigits: 2 })}`;
 const delivery_fee = 10;
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -153,7 +157,7 @@ const ShopContextProvider = (props) => {
     }, [token])
 
     const value = {
-        products, productsLoading, currency, delivery_fee,
+        products, productsLoading, currency, formatPrice, delivery_fee,
         search, setSearch, showSearch, setShowSearch,
         cartItems, cartLines, addToCart, setCartItems,
         getCartCount, updateQuantity,

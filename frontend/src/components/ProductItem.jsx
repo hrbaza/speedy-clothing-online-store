@@ -4,7 +4,7 @@ import { FiArrowUpRight } from 'react-icons/fi'
 import { ShopContext, isInStock } from '../context/ShopContext'
 
 const ProductItem = ({ product }) => {
-  const { currency } = useContext(ShopContext)
+  const { formatPrice } = useContext(ShopContext)
   const { _id, image, name, price, category, subCategory, bestseller } = product
   const inStock = isInStock(product)
 
@@ -48,7 +48,7 @@ const ProductItem = ({ product }) => {
           <p className='text-[11px] font-semibold uppercase tracking-[0.2em] text-ink/40'>{category} · {subCategory}</p>
           <p className='mt-1 truncate font-medium text-ink transition group-hover:text-brand-600'>{name}</p>
         </div>
-        <p className='shrink-0 font-display text-lg font-bold'>{currency}{price}</p>
+        <p className='shrink-0 font-display text-lg font-bold'>{formatPrice(price)}</p>
       </div>
     </Link>
   )

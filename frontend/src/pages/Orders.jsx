@@ -16,7 +16,7 @@ const STATUS_STYLES = {
 }
 
 const Orders = () => {
-  const { backendUrl, token, currency } = useContext(ShopContext);
+  const { backendUrl, token, formatPrice } = useContext(ShopContext);
   const [orderData, setOrderData] = useState([]);
   const [isLoading, setIsLoading] = useState(true)
 
@@ -87,7 +87,7 @@ const Orders = () => {
                   <div className='min-w-0 flex-1'>
                     <p className='truncate text-lg font-semibold'>{item.name}</p>
                     <div className='mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-ink/60'>
-                      <span className='font-display font-bold text-ink'>{currency}{item.price}</span>
+                      <span className='font-display font-bold text-ink'>{formatPrice(item.price)}</span>
                       <span>Qty {item.quantity}</span>
                       <span>Size {item.size}</span>
                     </div>

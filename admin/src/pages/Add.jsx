@@ -153,10 +153,10 @@ const Add = ({ token }) => {
         <section className='card space-y-5 p-6 sm:p-8'>
           <h2 className='heading text-lg'>Pricing & category</h2>
           <div>
-            <label htmlFor='price' className='label'>Price</label>
+            <label htmlFor='price' className='label'>Price (PKR)</label>
             <div className='relative'>
               <span className='absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-ink/40'>{currency}</span>
-              <input id='price' onChange={(e) => setPrice(e.target.value)} value={price} className='input pl-9' type="number" min="0" step="0.01" placeholder='25.00' required />
+              <input id='price' onChange={(e) => setPrice(e.target.value)} value={price} className='input pl-11' type="number" min="0" step="1" placeholder='1500' required />
             </div>
           </div>
           <div className='grid grid-cols-2 gap-4'>
