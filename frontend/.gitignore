@@ -25,3 +25,6 @@ dist-ssr
 # Build output and secrets
 dist
 .env
+
+.vercel
+.env*
